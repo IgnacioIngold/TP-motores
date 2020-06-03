@@ -17,6 +17,9 @@ void AZombie::BeginPlay()
 	Super::BeginPlay();
 
 	target = GetWorld()->GetFirstPlayerController()->GetPawn();
+	currentBehaviour = EBehaviours::Follow;
+	timeAttack = attackDuration;
+	_anim = Cast<UAnimI_Zombie>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
 	
 }
 
@@ -25,8 +28,31 @@ void AZombie::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FollowMyTarget(DeltaTime);
+	dir = target->GetActorLocation() - GetActorLocation();
+
+	switch (currentBehaviour)
+	{
+
+	case EBehaviours::Follow:
+		FollowMyTarget(DeltaTime);
+		break;
+	case EBehaviours::LookTarget:
+		LookTowardsTarget();
+		break;
+	case EBehaviours::Avoidance:
+		AvoidanceObstacles(DeltaTime);
+		break;
+	case EBehaviours::Attack:
+		Attack(DeltaTime);
+		break;
+	
+	}
+	
+	
+	
 }
+
+
 
 void AZombie::FollowMyTarget(float deltaTime)
 {
@@ -35,28 +61,28 @@ void AZombie::FollowMyTarget(float deltaTime)
 
 	//Si la distancia es menor a cierta cantidad me detengo.
 	/*FVector distanceToTarget = (target->GetActorLocation() - GetActorLocation());*/
-	float distanceToTarget = FVector::Distance(target->GetActorLocation(), GetActorLocation());
-
-	if (distanceToTarget < AttackRange)
+	float distanceToTarget = dir.Size();
+	UE_LOG(LogTemp, Warning, TEXT("mi distancia es %f "), distanceToTarget);
+	if (distanceToTarget <= AttackRange)
 	{
 		//Si el enemigo entra en rango de Combate. Se detiene.
-		IsAttacking = true;
+		
+		timeAttack = attackDuration;
+		currentBehaviour = EBehaviours::Attack;
+		
 	}
 	else
 	{
 		//Si el enemigo no tiene dentro del rango al Player.
-		MovementSpeed = 1.0f;
+		
 		SetActorLocation(GetActorLocation() + GetActorForwardVector()*MovementSpeed*deltaTime);
 	}
 
 }
 
 void AZombie::LookTowardsTarget()
-{
-	//Miro en la dirección de mi objetivo.
-	FVector dirToTarget = target->GetActorLocation() - GetActorLocation();
-	FRotator newRotation = dirToTarget.Rotation();
-	SetActorRotation(newRotation);
+{	
+	SetActorRotation(dir.Rotation());
 }
 
 void AZombie::AvoidanceObstacles(float deltaTime)
@@ -64,9 +90,26 @@ void AZombie::AvoidanceObstacles(float deltaTime)
 
 }
 
-void AZombie::Attack()
+void AZombie::Attack(float deltaTime)
 {
+	LookTowardsTarget();
+	
 
+	timeAttack -= deltaTime;
+	
+	
+	if (_anim->Attaking == false && timeAttack<=0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("toma broh, chupala"));
+		currentBehaviour = EBehaviours::Follow;
+		return;
+	}
+	_anim->ChangeAttackValue(true);
+	
+}
+
+void AZombie::Die()
+{
 }
 
 

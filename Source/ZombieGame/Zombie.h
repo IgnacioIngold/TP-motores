@@ -4,15 +4,20 @@
 
 #include "Engine.h"
 #include "Engine/World.h"
+#include "AnimI_Zombie.h"
 #include "GameFramework/Actor.h"
 #include "Zombie.generated.h"
+
+
+
 
 UENUM(BlueprintType)
 enum class EBehaviours : uint8
 {
 	Follow UMETA(DisplayName = "FollowTarget"),
 	LookTarget UMETA(DisplayName = "Look at Target"),
-	Avoidance UMETA(DisplayName = "Avoid Obstacles")
+	Avoidance UMETA(DisplayName = "Avoid Obstacles"),
+	Attack UMETA(DisplayName = "Attacking")
 };
 
 UCLASS()
@@ -27,13 +32,13 @@ public:
 	UPROPERTY(VisibleAnywhere)
 		AActor * target;
 
-	/*UPROPERTY(EditAnywhere)
-		EBehaviours currentBehaviour;*/
+	UPROPERTY(EditAnywhere, Category = Enum)
+		EBehaviours currentBehaviour;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		int Health;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	UPROPERTY(EditAnywhere)
 		float MovementSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation Controllers")
@@ -49,7 +54,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation Controllers")
 		bool IsAlive;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CustomVariables")
+	UPROPERTY(EditAnywhere)
 		float AttackRange;
 
 	UPROPERTY(EditAnywhere)
@@ -57,19 +62,33 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		AActor* closestObstacle;
+	
+	UPROPERTY(EditAnywhere)
+		float attackDuration;
+
+	UAnimI_Zombie* _anim;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	FVector dir;
+
+	float dist;
+
+	float timeAttack;
+
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	
 	void FollowMyTarget(float deltaTime);
 	void LookTowardsTarget();
 	void AvoidanceObstacles(float deltaTime);
-	void Attack();
+	void Attack(float deltaTime);
 	void Die();
 
 	UFUNCTION(BlueprintCallable)

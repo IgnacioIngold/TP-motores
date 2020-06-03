@@ -23,6 +23,7 @@ void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//alalalal
 	//Esto esta provocando comportamiento indeseado asi que valio ver**;
 	/*SetActorLocation((GetActorLocation() + GetActorForwardVector()) * speed * DeltaTime);*/
 }
