@@ -16,6 +16,15 @@ void AmyPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	USkeletalMeshComponent* mySkeletalMesh = FindComponentByClass<USkeletalMeshComponent>();
+	if (mySkeletalMesh)
+	{
+		this->animController = Cast<UBasePlayer_AnimInstance>(mySkeletalMesh->GetAnimInstance());
+		if (animController)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("La referencia fue seteada correctamente"));
+		}
+	}
 }
 
 // Called every frame
@@ -40,11 +49,13 @@ void AmyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AmyPlayer::MoveHorizontal(float HAxis)
 {
+	this->animController->horizontalAxis = HAxis;
 	AddMovementInput(GetActorRightVector(), HAxis);
 }
 
 void AmyPlayer::MoveVertical(float VAxis)
 {
+	this->animController->verticalAxis = VAxis;
 	AddMovementInput(GetActorForwardVector(), VAxis);
 }
 

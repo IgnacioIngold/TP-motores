@@ -21,6 +21,6 @@ public:
 public:
 	
 	UFUNCTION(BlueprintCallable)
-	void ChangeAttackValue(bool value);
+		void ChangeAttackValue(bool value);
 	
 };

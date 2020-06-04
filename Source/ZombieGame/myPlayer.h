@@ -4,6 +4,7 @@
 
 #include "Engine.h"
 #include "Bullet.h"
+#include "BasePlayer_AnimInstance.h"
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "myPlayer.generated.h"
@@ -32,20 +33,22 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	//Variables:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player References", meta = (DisplayPriority=1))
+		UBasePlayer_AnimInstance* animController;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
 		int health = 100;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
 		int MaxHealth = 100;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
 		int Ammo = 15;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
 		int AmmoInMagazine = 30;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
 		int MaxAmmoInMagazine = 30;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -56,6 +59,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class USceneComponent * DummyComponentTest;
+
 
 	//Funciones:
 
