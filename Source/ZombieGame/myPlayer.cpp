@@ -177,3 +177,11 @@ void AmyPlayer::Die()
 
 }
 
+void AmyPlayer::GetAndLoadWeapon()
+{
+	if (this->animController)
+	{
+		this->animController->hasWeapon = true;
+	}
+}
+

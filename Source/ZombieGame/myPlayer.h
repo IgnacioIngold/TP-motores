@@ -70,6 +70,7 @@ public:
 	void Jump();                      //Función que permite hacer un salto.
 	void Reload();                    //Función que permite recargar el arma.
 	void Die();                        // Función que llamamos al reducir nuestra vida a 0;
+	void GetAndLoadWeapon();          //Función que llamamos al obtener un arma.
 	
 	UFUNCTION(BlueprintCallable)
 		void Heal(int Ammount);

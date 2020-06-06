@@ -17,7 +17,7 @@ class ZOMBIEGAME_API UBasePlayer_AnimInstance : public UAnimInstance
 public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		bool hasWeapon;
+		bool hasWeapon = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		bool isRunning;
