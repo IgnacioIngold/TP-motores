@@ -65,6 +65,8 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 		float attackDuration;
+	UPROPERTY(EditAnywhere)
+		float speedRot;
 
 	UAnimI_Zombie* _anim;
 
