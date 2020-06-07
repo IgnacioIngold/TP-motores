@@ -55,11 +55,7 @@ public:
 		TSubclassOf<class ABullet> prefabBullet;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<class USceneComponent> Dummy;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		class USceneComponent * DummyComponentTest;
-
+		UStaticMeshComponent* weaponMeshTest;
 
 	//Funciones:
 
