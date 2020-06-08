@@ -59,6 +59,13 @@ void AZombie::FollowMyTarget(float deltaTime)
 	//Me muevo en dirección a mi objetivo.
 	LookTowardsTarget();
 
+
+	if (closestObstacle)
+	{
+		currentBehaviour = EBehaviours::Avoidance;
+
+	}
+
 	//Si la distancia es menor a cierta cantidad me detengo.
 	/*FVector distanceToTarget = (target->GetActorLocation() - GetActorLocation());*/
 	float distanceToTarget = dir.Size();
@@ -88,6 +95,22 @@ void AZombie::LookTowardsTarget()
 void AZombie::AvoidanceObstacles(float deltaTime)
 {
 
+	UE_LOG(LogTemp, Warning, TEXT("Avoid"));
+	if (!closestObstacle)
+	{
+		FollowMyTarget(deltaTime);
+		return;
+	}
+	FVector direction = GetActorLocation() - closestObstacle->GetActorLocation();
+	direction = (target->GetActorLocation() - GetActorLocation()).GetSafeNormal() + (direction.GetSafeNormal() * WeightAvoid);
+
+	FVector Rot = FMath::Lerp(GetActorForwardVector(), direction, deltaTime * speedRot);
+
+	Rot.Z = 0;
+
+	SetActorRotation(Rot.Rotation());
+	SetActorLocation(GetActorLocation() + GetActorForwardVector() * MovementSpeed * deltaTime);
+
 }
 
 void AZombie::Attack(float deltaTime)
@@ -104,6 +127,7 @@ void AZombie::Attack(float deltaTime)
 		currentBehaviour = EBehaviours::Follow;
 		return;
 	}
+
 	_anim->ChangeAttackValue(true);
 	
 }
@@ -115,6 +139,17 @@ void AZombie::Die()
 
 void AZombie::myBeginOverlap(AActor * ActorOverlap) 
 {
+	if (ActorOverlap == this || ActorOverlap == target)
+		return;
 
+	if (closestObstacle)
+	{
+		FVector DistA = closestObstacle->GetActorLocation() - GetActorLocation();
+		FVector DistB = ActorOverlap->GetActorLocation() - GetActorLocation();
+		if (DistA.Size() > DistB.Size())
+			closestObstacle = ActorOverlap;
+	}
+	else
+		closestObstacle = ActorOverlap;
 }
 
