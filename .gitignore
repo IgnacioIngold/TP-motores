@@ -72,3 +72,8 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+#Packs de terceros!
+Content/ModularBuildingSet/*
+Content/M5VFXVOL2/*
+Content/GrassLandscape/*
