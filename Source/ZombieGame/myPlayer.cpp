@@ -22,6 +22,7 @@ void AmyPlayer::BeginPlay()
 		this->animController = Cast<UBasePlayer_AnimInstance>(mySkeletalMesh->GetAnimInstance());
 		if (animController)
 		{
+			animController->hasWeapon = true;
 			UE_LOG(LogTemp, Warning, TEXT("La referencia fue seteada correctamente"));
 		}
 	}
