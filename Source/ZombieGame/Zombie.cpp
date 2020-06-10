@@ -48,17 +48,13 @@ void AZombie::Tick(float DeltaTime)
 	
 	}
 	
-	
-	
 }
-
-
 
 void AZombie::FollowMyTarget(float deltaTime)
 {
 	//Me muevo en dirección a mi objetivo.
 	LookTowardsTarget();
-
+	
 
 	if (closestObstacle)
 	{
@@ -66,14 +62,15 @@ void AZombie::FollowMyTarget(float deltaTime)
 
 	}
 
-	//Si la distancia es menor a cierta cantidad me detengo.
-	/*FVector distanceToTarget = (target->GetActorLocation() - GetActorLocation());*/
+	
 	float distanceToTarget = dir.Size();
-	UE_LOG(LogTemp, Warning, TEXT("mi distancia es %f "), distanceToTarget);
+	
 	if (distanceToTarget <= AttackRange)
 	{
 		//Si el enemigo entra en rango de Combate. Se detiene.
+
 		
+		AttackPerform = false;
 		timeAttack = attackDuration;
 		currentBehaviour = EBehaviours::Attack;
 		
@@ -95,10 +92,10 @@ void AZombie::LookTowardsTarget()
 void AZombie::AvoidanceObstacles(float deltaTime)
 {
 
-	UE_LOG(LogTemp, Warning, TEXT("Avoid"));
+	
 	if (!closestObstacle)
 	{
-		FollowMyTarget(deltaTime);
+		currentBehaviour = EBehaviours::Follow;
 		return;
 	}
 	FVector direction = GetActorLocation() - closestObstacle->GetActorLocation();
@@ -120,10 +117,15 @@ void AZombie::Attack(float deltaTime)
 
 	timeAttack -= deltaTime;
 	
+	if (timeAttack <= 0.854f && AttackPerform == false)
+	{
+		AttackPerform = true;
+		raycastAttack();
+	}
 	
 	if (_anim->Attaking == false && timeAttack<=0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("toma broh, chupala"));
+		
 		currentBehaviour = EBehaviours::Follow;
 		return;
 	}
@@ -134,6 +136,25 @@ void AZombie::Attack(float deltaTime)
 
 void AZombie::Die()
 {
+}
+
+void AZombie::raycastAttack()
+{
+	FHitResult hit;
+
+	FCollisionQueryParams p = FCollisionQueryParams(TEXT(""), false, this);
+	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation()+GetActorForwardVector() * 150, ECollisionChannel::ECC_PhysicsBody, p);
+	if (hit.GetActor())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *hit.GetActor()->GetName());
+	}
+	AmyPlayer* CharacterHit = Cast<AmyPlayer>(hit.GetActor());
+	if (CharacterHit)
+	{
+		//CharacterHit->getHit(Damage);
+		UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
+	}
+	
 }
 
 
@@ -152,4 +173,13 @@ void AZombie::myBeginOverlap(AActor * ActorOverlap)
 	else
 		closestObstacle = ActorOverlap;
 }
+
+void AZombie::myEndOverlap(AActor* ActorOverlap)
+{
+	if (ActorOverlap == closestObstacle)
+	{
+		closestObstacle = NULL;
+	}
+}
+
 
