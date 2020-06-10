@@ -14,9 +14,6 @@ class ZOMBIEGAME_API AmyPlayer : public ACharacter
 {
 	GENERATED_BODY()
 
-	/*UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-		class USceneComponent* VR_MuzzleLocation;*/
-
 public:
 	// Sets default values for this character's properties
 	AmyPlayer();
@@ -36,6 +33,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player References", meta = (DisplayPriority=1))
 		UBasePlayer_AnimInstance* animController;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player References", meta = (DisplayPriority = 1))
+		USceneComponent* TestLocator;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player References", meta = (DisplayPriority = 1))
+		FTransform* TestTransform;*/
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
 		int health = 100;
 
@@ -54,19 +57,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class ABullet> prefabBullet;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UStaticMeshComponent* weaponMeshTest;
 
 	//Funciones:
 
 	void MoveHorizontal(float HAxis); //Mueve el player en Horizontal.
 	void MoveVertical(float VAxis);   //Mueve el player en Vertical.
 	void RotatePlayer(float rot);     //Rotación del Player.
-	//void Shoot();                     //Función Shoot Original. Dispara desde el centro del Actor Owner.
+	void StartShooting();             //Bindeado al input al presionar el boton.
+	void StopShooting();              //Bindeado al input al soltar el botón.
 	void Jump();                      //Función que permite hacer un salto.
 	void Reload();                    //Función que permite recargar el arma.
-	void Die();                        // Función que llamamos al reducir nuestra vida a 0;
+	void Die();                       // Función que llamamos al reducir nuestra vida a 0;
 	void GetAndLoadWeapon();          //Función que llamamos al obtener un arma.
+	void GetHit(int Damage);
 	
 	UFUNCTION(BlueprintCallable)
 		void Heal(int Ammount);

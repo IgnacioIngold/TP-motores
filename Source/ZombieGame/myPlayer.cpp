@@ -42,6 +42,8 @@ void AmyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	/*PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AmyPlayer::Shoot);*/
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AmyPlayer::Jump);
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AmyPlayer::Reload);
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AmyPlayer::StartShooting);
+	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &AmyPlayer::StopShooting);
 
 	PlayerInputComponent->BindAxis("Horizontal", this, &AmyPlayer::MoveHorizontal);
 	PlayerInputComponent->BindAxis("Vertical", this, &AmyPlayer::MoveVertical);
@@ -65,22 +67,44 @@ void AmyPlayer::RotatePlayer(float rot)
 	AddControllerYawInput(rot);
 }
 
-//void AmyPlayer::Shoot() 
-//{
-//	UE_LOG(LogTemp, Warning, TEXT("Disparo"));
-//
-//	UWorld* const World = GetWorld();
-//	if (World != NULL) 
-//	{
-//		if (prefabBullet != NULL)
-//		{
-//			FActorSpawnParameters spawnParams;
-//			spawnParams.Owner = GetOwner();
-//
-//			ABullet * bullet = World->SpawnActor<ABullet>(prefabBullet, GetActorLocation(), GetActorRotation(), spawnParams);
-//		}
-//	}
-//}
+void AmyPlayer::StartShooting()
+{
+	if (this->TestLocator != nullptr)
+	{
+		FTransform position = this->TestLocator->GetComponentTransform();
+		/*UE_LOG(LogTemp, Warning, TEXT("Disparo desde código, la referencia del locator esta seteada :D"));*/
+	
+		if (AmmoInMagazine > 0)
+		{
+			UWorld* const World = GetWorld();
+			if (World != NULL && prefabBullet != NULL)
+			{
+				FActorSpawnParameters spawnParams;
+				spawnParams.Owner = GetOwner();
+
+				ABullet* bullet = World->SpawnActor<ABullet>(prefabBullet, position);
+
+				if (this->animController != NULL)
+				{
+					this->animController->isShooting = true;
+				}
+			}
+		}
+		else
+		{
+			/*UE_LOG(LogTemp, Warning, TEXT("Intentaste Disparar pero no tenés mas balas... Recarga!"));*/
+		}
+	}
+}
+
+void AmyPlayer::StopShooting()
+{
+	if (this->animController != NULL)
+	{
+		this->animController->isShooting = false;
+		UE_LOG(LogTemp, Warning, TEXT("Stop Shooting :D"));
+	}
+}
 
 void AmyPlayer::ShootWithTransform(FTransform transform)
 {
@@ -95,6 +119,11 @@ void AmyPlayer::ShootWithTransform(FTransform transform)
 			spawnParams.Owner = GetOwner();
 
 			ABullet * bullet = World->SpawnActor<ABullet>(prefabBullet, transform);
+			
+			if (this->animController != NULL)
+			{
+				this->animController->isShooting = true;
+			}
 		}
 	}
 	else
@@ -184,5 +213,10 @@ void AmyPlayer::GetAndLoadWeapon()
 	{
 		this->animController->hasWeapon = true;
 	}
+}
+
+void AmyPlayer::GetHit(int Damage)
+{
+	//Pos me meten la verga :v
 }
 
