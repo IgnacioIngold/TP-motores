@@ -133,6 +133,8 @@ void AZombie::Attack(float deltaTime)
 	_anim->ChangeAttackValue(true);
 	
 }
+void AZombie::GetHit(int damage)
+{}
 
 void AZombie::Die()
 {
@@ -151,7 +153,7 @@ void AZombie::raycastAttack()
 	AmyPlayer* CharacterHit = Cast<AmyPlayer>(hit.GetActor());
 	if (CharacterHit)
 	{
-		//CharacterHit->getHit(Damage);
+		CharacterHit->GetHit(Damage);
 		UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
 	}
 	

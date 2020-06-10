@@ -98,6 +98,7 @@ public:
 	void LookTowardsTarget();
 	void AvoidanceObstacles(float deltaTime);
 	void Attack(float deltaTime);
+	void GetHit(int Damage);
 	void Die();
 	void raycastAttack();
 	
