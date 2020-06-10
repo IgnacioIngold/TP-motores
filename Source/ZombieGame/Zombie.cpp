@@ -48,17 +48,13 @@ void AZombie::Tick(float DeltaTime)
 	
 	}
 	
-	
-	
 }
-
-
 
 void AZombie::FollowMyTarget(float deltaTime)
 {
 	//Me muevo en dirección a mi objetivo.
 	LookTowardsTarget();
-
+	
 
 	if (closestObstacle)
 	{
@@ -66,14 +62,15 @@ void AZombie::FollowMyTarget(float deltaTime)
 
 	}
 
-	//Si la distancia es menor a cierta cantidad me detengo.
-	/*FVector distanceToTarget = (target->GetActorLocation() - GetActorLocation());*/
+	
 	float distanceToTarget = dir.Size();
-	UE_LOG(LogTemp, Warning, TEXT("mi distancia es %f "), distanceToTarget);
+	
 	if (distanceToTarget <= AttackRange)
 	{
 		//Si el enemigo entra en rango de Combate. Se detiene.
-		
+
+		UE_LOG(LogTemp, Warning, TEXT("empece el ataque"));
+		AttackPerform = false;
 		timeAttack = attackDuration;
 		currentBehaviour = EBehaviours::Attack;
 		
@@ -95,10 +92,10 @@ void AZombie::LookTowardsTarget()
 void AZombie::AvoidanceObstacles(float deltaTime)
 {
 
-	UE_LOG(LogTemp, Warning, TEXT("Avoid"));
+	
 	if (!closestObstacle)
 	{
-		FollowMyTarget(deltaTime);
+		currentBehaviour = EBehaviours::Follow;
 		return;
 	}
 	FVector direction = GetActorLocation() - closestObstacle->GetActorLocation();
@@ -120,10 +117,15 @@ void AZombie::Attack(float deltaTime)
 
 	timeAttack -= deltaTime;
 	
-	
+	if (timeAttack <= 0.854f && AttackPerform == false)
+	{
+		AttackPerform = true;
+		raycastAttack();
+	}
+	UE_LOG(LogTemp, Warning, TEXT("mi tiempo es %f "), timeAttack);
 	if (_anim->Attaking == false && timeAttack<=0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("toma broh, chupala"));
+		UE_LOG(LogTemp, Warning, TEXT("termino el attaque"));
 		currentBehaviour = EBehaviours::Follow;
 		return;
 	}
@@ -134,6 +136,12 @@ void AZombie::Attack(float deltaTime)
 
 void AZombie::Die()
 {
+}
+
+void AZombie::raycastAttack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("toma broh, te pegue"));
+	UE_LOG(LogTemp, Log, TEXT("Bool value is: %s"), AttackPerform ? "true" : "false");
 }
 
 
@@ -152,4 +160,13 @@ void AZombie::myBeginOverlap(AActor * ActorOverlap)
 	else
 		closestObstacle = ActorOverlap;
 }
+
+void AZombie::myEndOverlap(AActor* ActorOverlap)
+{
+	if (ActorOverlap == closestObstacle)
+	{
+		closestObstacle = NULL;
+	}
+}
+
 

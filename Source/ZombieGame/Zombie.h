@@ -29,10 +29,12 @@ public:
 	// Sets default values for this actor's properties
 	AZombie();
 
+
+
 	UPROPERTY(VisibleAnywhere)
 		AActor * target;
 
-	UPROPERTY(EditAnywhere, Category = Enum)
+	UPROPERTY(visibleAnywhere)
 		EBehaviours currentBehaviour;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
@@ -80,6 +82,8 @@ protected:
 
 	float timeAttack;
 
+	bool AttackPerform;
+
 
 
 public:	
@@ -92,8 +96,15 @@ public:
 	void AvoidanceObstacles(float deltaTime);
 	void Attack(float deltaTime);
 	void Die();
-
+	void raycastAttack();
+	
 	UFUNCTION(BlueprintCallable)
 		void myBeginOverlap(AActor * ActorOverlap);
+	
+	UFUNCTION(BlueprintCallable)
+		void myEndOverlap(AActor* ActorOverlap);
+
+
+	
 	
 };
