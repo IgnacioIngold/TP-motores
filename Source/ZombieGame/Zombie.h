@@ -5,6 +5,7 @@
 #include "Engine.h"
 #include "Engine/World.h"
 #include "AnimI_Zombie.h"
+#include "myPlayer.h"
 #include "GameFramework/Actor.h"
 #include "Zombie.generated.h"
 
@@ -69,6 +70,8 @@ public:
 		float attackDuration;
 	UPROPERTY(EditAnywhere)
 		float speedRot;
+	UPROPERTY(EditAnywhere)
+		int Damage;
 
 	UAnimI_Zombie* _anim;
 

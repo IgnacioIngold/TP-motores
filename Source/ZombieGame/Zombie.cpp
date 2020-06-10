@@ -69,7 +69,7 @@ void AZombie::FollowMyTarget(float deltaTime)
 	{
 		//Si el enemigo entra en rango de Combate. Se detiene.
 
-		UE_LOG(LogTemp, Warning, TEXT("empece el ataque"));
+		
 		AttackPerform = false;
 		timeAttack = attackDuration;
 		currentBehaviour = EBehaviours::Attack;
@@ -122,10 +122,10 @@ void AZombie::Attack(float deltaTime)
 		AttackPerform = true;
 		raycastAttack();
 	}
-	UE_LOG(LogTemp, Warning, TEXT("mi tiempo es %f "), timeAttack);
+	
 	if (_anim->Attaking == false && timeAttack<=0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("termino el attaque"));
+		
 		currentBehaviour = EBehaviours::Follow;
 		return;
 	}
@@ -140,8 +140,21 @@ void AZombie::Die()
 
 void AZombie::raycastAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("toma broh, te pegue"));
-	UE_LOG(LogTemp, Log, TEXT("Bool value is: %s"), AttackPerform ? "true" : "false");
+	FHitResult hit;
+
+	FCollisionQueryParams p = FCollisionQueryParams(TEXT(""), false, this);
+	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation()+GetActorForwardVector() * 150, ECollisionChannel::ECC_PhysicsBody, p);
+	if (hit.GetActor())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *hit.GetActor()->GetName());
+	}
+	AmyPlayer* CharacterHit = Cast<AmyPlayer>(hit.GetActor());
+	if (CharacterHit)
+	{
+		//CharacterHit->getHit(Damage);
+		UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
+	}
+	
 }
 
 
