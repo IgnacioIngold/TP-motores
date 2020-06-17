@@ -3,10 +3,9 @@
 #pragma once
 
 #include "Engine.h"
-#include "GameFramework/Actor.h"
-#include "Zombie.h"
-#include "Components/CapsuleComponent.h"
 #include "Bullet.generated.h"
+
+class AZombie;
 
 UCLASS()
 class ZOMBIEGAME_API ABullet : public AActor

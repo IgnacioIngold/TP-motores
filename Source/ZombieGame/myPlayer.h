@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
 #include "Engine.h"
 #include "Bullet.h"
 #include "BasePlayer_AnimInstance.h"
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "ZG_GameModeBase.h"
+#include "Math/UnrealMathUtility.h"
 #include "myPlayer.generated.h"
 
 UCLASS()
@@ -56,6 +56,11 @@ public:
 		TSubclassOf<class ABullet> prefabBullet;
 
 
+private:
+
+	AZG_GameModeBase* _gameMode;
+
+public:
 	//Funciones:
 
 	void MoveHorizontal(float HAxis); //Mueve el player en Horizontal.
@@ -66,6 +71,7 @@ public:
 	void Jump();                      //Función que permite hacer un salto.
 	void Reload();                    //Función que permite recargar el arma.
 	void Die();                       // Función que llamamos al reducir nuestra vida a 0;
+	void RespawnPlayer();             // Función que llamamos para avisarle al player que se resetee.
 	void GetAndLoadWeapon();          //Función que llamamos al obtener un arma.
 	void GetHit(int Damage);
 	

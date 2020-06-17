@@ -2,7 +2,6 @@
 
 #include "Zombie.h"
 
-
 // Sets default values
 AZombie::AZombie()
 {
@@ -183,7 +182,7 @@ void AZombie::raycastAttack()
 	if (CharacterHit)
 	{
 		CharacterHit->GetHit(Damage);
-		UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
+		//UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
 	}
 	
 }

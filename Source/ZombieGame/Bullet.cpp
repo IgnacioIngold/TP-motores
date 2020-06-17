@@ -1,14 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Bullet.h"
-
+#include "Zombie.h"
 
 // Sets default values
 ABullet::ABullet()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -16,7 +15,6 @@ void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
 	TimerToDestruction();
-
 }
 
 // Called every frame
@@ -24,10 +22,6 @@ void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	SetActorLocation(GetActorLocation() + GetActorForwardVector() * speed * DeltaTime);
-
-	//alalalal
-	//Esto esta provocando comportamiento indeseado asi que valio ver**;
-	/*SetActorLocation((GetActorLocation() + GetActorForwardVector()) * speed * DeltaTime);*/
 }
 
 void ABullet::TimerToDestruction()
@@ -46,7 +40,6 @@ void ABullet::CheckCollision(AActor* otherActor)
 	if(zombie)
 	{
 		zombie->GetHit(dmg);
-		
 	}
 }
 

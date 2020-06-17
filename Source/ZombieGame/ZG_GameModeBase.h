@@ -8,6 +8,8 @@
 #include "Blueprint/UserWidget.h"
 #include "ZG_GameModeBase.generated.h"
 
+class AmyPlayer;
+
 /**
  * 
  */

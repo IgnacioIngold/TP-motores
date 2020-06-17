@@ -27,10 +27,10 @@ void AmyPlayer::BeginPlay()
 		}
 	}
 
-	AZG_GameModeBase* gamemode = Cast<AZG_GameModeBase>(GetWorld()->GetAuthGameMode());
-	if (gamemode)
+	auto gm = Cast<AZG_GameModeBase>(GetWorld()->GetAuthGameMode());
+	if (gm != nullptr)
 	{
-		
+		_gameMode = gm;
 	}
 }
 
@@ -39,6 +39,11 @@ void AmyPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	/*UE_LOG(LogTemp, Warning, TEXT("Mi posici�n es %s y mi rotaci�n es %s"), *GetActorLocation().ToString(), *GetActorRotation().ToString());*/
+
+	if (health > 0)
+	{
+		_gameMode->GameTime += DeltaTime;
+	}
 }
 
 // Called to bind functionality to input
@@ -51,8 +56,6 @@ void AmyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AmyPlayer::StartShooting);
 	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &AmyPlayer::StopShooting);
 
-	PlayerInputComponent->BindAction("KillPlayerOnce", IE_Released, this, &AmyPlayer::TestLoadWinLevel);
-
 	PlayerInputComponent->BindAxis("Horizontal", this, &AmyPlayer::MoveHorizontal);
 	PlayerInputComponent->BindAxis("Vertical", this, &AmyPlayer::MoveVertical);
 	PlayerInputComponent->BindAxis("RotatePlayer", this, &AmyPlayer::RotatePlayer);
@@ -60,24 +63,31 @@ void AmyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AmyPlayer::MoveHorizontal(float HAxis)
 {
-	this->animController->horizontalAxis = HAxis;
-	AddMovementInput(GetActorRightVector(), HAxis);
+	if (health > 0)
+	{
+		this->animController->horizontalAxis = HAxis;
+		AddMovementInput(GetActorRightVector(), HAxis);
+	}
 }
 
 void AmyPlayer::MoveVertical(float VAxis)
 {
-	this->animController->verticalAxis = VAxis;
-	AddMovementInput(GetActorForwardVector(), VAxis);
+	if (health > 0)
+	{
+		this->animController->verticalAxis = VAxis;
+		AddMovementInput(GetActorForwardVector(), VAxis);
+	}
 }
 
 void AmyPlayer::RotatePlayer(float rot) 
 {
-	AddControllerYawInput(rot);
+	if (health > 0)
+		AddControllerYawInput(rot);
 }
 
 void AmyPlayer::StartShooting()
 {
-	if (this->TestLocator != nullptr)
+	if (this->TestLocator != nullptr && health > 0)
 	{
 		FTransform position = this->TestLocator->GetComponentTransform();
 		/*UE_LOG(LogTemp, Warning, TEXT("Disparo desde código, la referencia del locator esta seteada :D"));*/
@@ -212,7 +222,18 @@ void AmyPlayer::AddExtraMagazineSlots(int extraBullets)
 
 void AmyPlayer::Die() 
 {
+	animController->isDead = true;
 
+	if (_gameMode)
+	{
+		_gameMode->PlayerDied();
+	}
+}
+
+void AmyPlayer::RespawnPlayer()
+{
+	animController->isDead = false;
+	health = MaxHealth;
 }
 
 void AmyPlayer::GetAndLoadWeapon()
@@ -225,15 +246,17 @@ void AmyPlayer::GetAndLoadWeapon()
 
 void AmyPlayer::GetHit(int Damage)
 {
-	//Pos me meten la verga :v
-}
-
-void AmyPlayer::TestLoadWinLevel()
-{
-	AZG_GameModeBase* myGameMode = Cast<AZG_GameModeBase>((GetWorld()->GetAuthGameMode()));
-	if (myGameMode)
+	if (health > 0)
 	{
-		myGameMode->PlayerDied();
+		//Pos me meten la verga :v
+		health -= Damage;
+		UE_LOG(LogTemp, Warning, TEXT("Recibí Daño, vida restante es: %i"), health);
+
+		if (health <= 0)
+		{
+			health = 0;
+			Die();
+		}
 	}
 }
 

@@ -2,6 +2,7 @@
 
 
 #include "ZG_GameModeBase.h"
+#include "myPlayer.h"
 
 void AZG_GameModeBase::StartPlay()
 {
@@ -69,7 +70,16 @@ void AZG_GameModeBase::RespawnPlayer()
 {
 	//Respawneamos al player.
 	if (DefaultPlayerStart)
-		GetWorld()->GetFirstPlayerController()->GetPawn()->SetActorTransform(DefaultPlayerStart->GetTransform());
+	{
+		auto player = GetWorld()->GetFirstPlayerController()->GetPawn();
+		player->SetActorTransform(DefaultPlayerStart->GetTransform());
+
+		auto mp = Cast<AmyPlayer>(player);
+		if (mp)
+		{
+			mp->RespawnPlayer();
+		}
+	}
 	if (_respawnWidgetInstance)
 		_respawnWidgetInstance->RemoveFromParent();
 }

@@ -9,9 +9,6 @@
 #include "GameFramework/Actor.h"
 #include "Zombie.generated.h"
 
-
-
-
 UENUM(BlueprintType)
 enum class EBehaviours : uint8
 {
