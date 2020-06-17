@@ -26,6 +26,12 @@ void AmyPlayer::BeginPlay()
 			UE_LOG(LogTemp, Warning, TEXT("La referencia fue seteada correctamente"));
 		}
 	}
+
+	AZG_GameModeBase* gamemode = Cast<AZG_GameModeBase>(GetWorld()->GetAuthGameMode());
+	if (gamemode)
+	{
+		
+	}
 }
 
 // Called every frame
@@ -44,6 +50,8 @@ void AmyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AmyPlayer::Reload);
 	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AmyPlayer::StartShooting);
 	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &AmyPlayer::StopShooting);
+
+	PlayerInputComponent->BindAction("KillPlayerOnce", IE_Released, this, &AmyPlayer::TestLoadWinLevel);
 
 	PlayerInputComponent->BindAxis("Horizontal", this, &AmyPlayer::MoveHorizontal);
 	PlayerInputComponent->BindAxis("Vertical", this, &AmyPlayer::MoveVertical);
@@ -218,5 +226,14 @@ void AmyPlayer::GetAndLoadWeapon()
 void AmyPlayer::GetHit(int Damage)
 {
 	//Pos me meten la verga :v
+}
+
+void AmyPlayer::TestLoadWinLevel()
+{
+	AZG_GameModeBase* myGameMode = Cast<AZG_GameModeBase>((GetWorld()->GetAuthGameMode()));
+	if (myGameMode)
+	{
+		myGameMode->PlayerDied();
+	}
 }
 

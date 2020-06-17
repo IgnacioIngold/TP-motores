@@ -7,6 +7,7 @@
 #include "BasePlayer_AnimInstance.h"
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
+#include "ZG_GameModeBase.h"
 #include "myPlayer.generated.h"
 
 UCLASS()
@@ -35,9 +36,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player References", meta = (DisplayPriority = 1))
 		USceneComponent* TestLocator;
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player References", meta = (DisplayPriority = 1))
-		FTransform* TestTransform;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
 		int health = 100;
@@ -85,4 +83,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void ShootWithPositionAndRotation(FVector position, FRotator rotation);
+
+	void TestLoadWinLevel();
 };
