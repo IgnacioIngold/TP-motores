@@ -39,13 +39,13 @@ public:
 		EBehaviours currentBehaviour;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-		int Health;
+		float Health;
 
 	UPROPERTY(EditAnywhere)
 		float MovementSpeed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation Controllers")
-		float MovementAnimState;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float HeathPercent;
 
 	//Pasa a ataque si está atacando.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation Controllers")
@@ -78,6 +78,7 @@ public:
 	FTimerHandle timerDead;
 
 
+
 	UAnimI_Zombie* _anim;
 
 protected:
@@ -104,9 +105,12 @@ public:
 	void AvoidanceObstacles(float deltaTime);
 	void Attack(float deltaTime);
 	void GetHit(int Damage);
+	UFUNCTION(BlueprintCallable)
 	void Die();
+
 	void DestroyDead();
 	void raycastAttack();
+	
 	
 	UFUNCTION(BlueprintCallable)
 		void myBeginOverlap(AActor * ActorOverlap);

@@ -29,7 +29,7 @@ void AZombie::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	dir = target->GetActorLocation() - GetActorLocation();
-	if (!IsDead)
+	if (!IsDead && !_anim->GetHited)
 	{
 
 	switch (currentBehaviour)
@@ -143,8 +143,15 @@ void AZombie::GetHit(int damage)
 {
 	Health -= damage;
 	_anim->ChangeHitValue(true);
+	UE_LOG(LogTemp, Warning, TEXT("%f"), HeathPercent);
+	HeathPercent = Health/100.0f;
+	UE_LOG(LogTemp, Warning, TEXT("%f"), HeathPercent);
+
 	if (Health <= 0)
+	{
+		Health = 0;
 		Die();
+	}
 		
 
 }
