@@ -55,7 +55,7 @@ public:
 		bool IsWalking;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation Controllers")
-		bool IsAlive;
+		bool IsDead;
 
 	UPROPERTY(EditAnywhere)
 		float AttackRange;
@@ -68,10 +68,15 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 		float attackDuration;
+
 	UPROPERTY(EditAnywhere)
 		float speedRot;
+
 	UPROPERTY(EditAnywhere)
 		int Damage;
+
+	FTimerHandle timerDead;
+
 
 	UAnimI_Zombie* _anim;
 
@@ -100,6 +105,7 @@ public:
 	void Attack(float deltaTime);
 	void GetHit(int Damage);
 	void Die();
+	void DestroyDead();
 	void raycastAttack();
 	
 	UFUNCTION(BlueprintCallable)

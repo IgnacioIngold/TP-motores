@@ -17,10 +17,17 @@ class ZOMBIEGAME_API UAnimI_Zombie : public UAnimInstance
 public: 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool Attaking;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		bool Die;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		bool GetHited;
 public:
 	
 	UFUNCTION(BlueprintCallable)
 		void ChangeAttackValue(bool value);
+	UFUNCTION(BlueprintCallable)
+		void ChangeHitValue(bool value);
+	UFUNCTION(BlueprintCallable)
+		void ChangeLifeValue(bool value);
 	
 };

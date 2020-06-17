@@ -29,6 +29,8 @@ void AZombie::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	dir = target->GetActorLocation() - GetActorLocation();
+	if (!IsDead)
+	{
 
 	switch (currentBehaviour)
 	{
@@ -47,6 +49,10 @@ void AZombie::Tick(float DeltaTime)
 		break;
 	
 	}
+
+	}
+
+
 	
 }
 
@@ -134,11 +140,27 @@ void AZombie::Attack(float deltaTime)
 	
 }
 void AZombie::GetHit(int damage)
-{}
+{
+	Health -= damage;
+	_anim->ChangeHitValue(true);
+	if (Health <= 0)
+		Die();
+		
+
+}
 
 void AZombie::Die()
 {
+	_anim->ChangeLifeValue(true);
+	IsDead = true;
+	GetWorld()->GetTimerManager().SetTimer(timerDead, this , &AZombie::DestroyDead, 10.0f , false);
+	
 }
+void AZombie::DestroyDead()
+{
+	Destroy();
+}
+
 
 void AZombie::raycastAttack()
 {
