@@ -15,16 +15,40 @@ ABullet::ABullet()
 void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	TimerToDestruction();
+
 }
 
 // Called every frame
 void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	SetActorLocation(GetActorLocation() + GetActorForwardVector() * speed * DeltaTime);
 
 	//alalalal
 	//Esto esta provocando comportamiento indeseado asi que valio ver**;
 	/*SetActorLocation((GetActorLocation() + GetActorForwardVector()) * speed * DeltaTime);*/
 }
+
+void ABullet::TimerToDestruction()
+{
+	GetWorld()->GetTimerManager().SetTimer(timerDestruction, this, &ABullet::SelfDestruction, 3.0f, false);
+}
+
+void ABullet::SelfDestruction()
+{
+	Destroy();
+}
+
+void ABullet::CheckCollision(AActor* otherActor)
+{
+	auto zombie = Cast<AZombie>(otherActor);
+	if(zombie)
+	{
+		zombie->GetHit(dmg);
+		
+	}
+}
+
+
 

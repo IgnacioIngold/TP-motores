@@ -3,27 +3,27 @@
 #pragma once
 
 #include "Engine.h"
-#include "GameFramework/Actor.h"
 #include "Zombie.h"
-#include "Components/CapsuleComponent.h"
-#include "Bullet.generated.h"
+#include "Engine/World.h"
+#include "GameFramework/Actor.h"
+#include "MyActor_Spawner.generated.h"
 
 UCLASS()
-class ZOMBIEGAME_API ABullet : public AActor
+class ZOMBIEGAME_API AMyActor_Spawner : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ABullet();
-	
-	UPROPERTY(EditAnywhere)
-		float speed;
-	UPROPERTY(EditAnywhere)
-		float dmg;
+	AMyActor_Spawner();
+	UPROPERTY(EditAnyWhere)
+		TSubclassOf<AZombie> prefabZombie;
+	UPROPERTY(EditAnyWhere)
+		float timerToSpawn;
+	UPROPERTY(EditAnyWhere)
+		bool bucleSpawn;
 
-
-	FTimerHandle timerDestruction;
+	FTimerHandle timerSpawn;
 
 protected:
 	// Called when the game starts or when spawned
@@ -32,9 +32,5 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	void TimerToDestruction();
-	void SelfDestruction();
-	
-	UFUNCTION(BlueprintCallable)
-		void CheckCollision(AActor* otherActor);
+	void SpawnZombie();
 };
