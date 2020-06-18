@@ -29,12 +29,15 @@ void AZG_GameModeBase::AddPlayerLifes(int ExtraLifes)
 
 void AZG_GameModeBase::PlayerDied()
 {
-	//Chequeo cuantas vidas todavía le quedan al jugador.
 	this->RemainingLifes--;
 
 	if (this->RemainingLifes <= 0)
 	{
-		//Si el jugador ya no tiene mas vidas, se terminó el juego.
+		//Cargo la data resultante en el GameInstance.
+		UZG_GameInstance* gameInstance = Cast<UZG_GameInstance>(GetWorld()->GetGameInstance());
+		gameInstance->AcumulatedPoints = Score;
+		gameInstance->TimeSurvived = GameTime;
+
 		//Cargo la escena de derrota.
 		if (_currentWorld)
 			UGameplayStatics::OpenLevel(GetWorld(), "/Game/Levels/DefeatLevel", false);

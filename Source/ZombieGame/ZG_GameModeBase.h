@@ -6,6 +6,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "GameFramework/GameModeBase.h"
 #include "Blueprint/UserWidget.h"
+#include "ZG_GameInstance.h"
 #include "ZG_GameModeBase.generated.h"
 
 class AmyPlayer;
