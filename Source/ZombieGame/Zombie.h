@@ -18,6 +18,8 @@ enum class EBehaviours : uint8
 	Attack UMETA(DisplayName = "Attacking")
 };
 
+class AZG_GameModeBase;
+
 UCLASS()
 class ZOMBIEGAME_API AZombie : public AActor
 {
@@ -77,6 +79,7 @@ public:
 
 
 	UAnimI_Zombie* _anim;
+	AZG_GameModeBase* _gamemode;
 
 protected:
 	// Called when the game starts or when spawned

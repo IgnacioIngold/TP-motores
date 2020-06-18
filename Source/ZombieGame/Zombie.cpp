@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Zombie.h"
+#include "ZG_GameModeBase.h"
 
 // Sets default values
 AZombie::AZombie()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -19,7 +19,7 @@ void AZombie::BeginPlay()
 	currentBehaviour = EBehaviours::Follow;
 	timeAttack = attackDuration;
 	_anim = Cast<UAnimI_Zombie>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
-	
+	_gamemode = Cast<AZG_GameModeBase>(GetWorld()->GetAuthGameMode());
 }
 
 // Called every frame
@@ -30,29 +30,24 @@ void AZombie::Tick(float DeltaTime)
 	dir = target->GetActorLocation() - GetActorLocation();
 	if (!IsDead && !_anim->GetHited)
 	{
+		switch (currentBehaviour)
+		{
 
-	switch (currentBehaviour)
-	{
-
-	case EBehaviours::Follow:
-		FollowMyTarget(DeltaTime);
-		break;
-	case EBehaviours::LookTarget:
-		LookTowardsTarget();
-		break;
-	case EBehaviours::Avoidance:
-		AvoidanceObstacles(DeltaTime);
-		break;
-	case EBehaviours::Attack:
-		Attack(DeltaTime);
-		break;
+		case EBehaviours::Follow:
+			FollowMyTarget(DeltaTime);
+			break;
+		case EBehaviours::LookTarget:
+			LookTowardsTarget();
+			break;
+		case EBehaviours::Avoidance:
+			AvoidanceObstacles(DeltaTime);
+			break;
+		case EBehaviours::Attack:
+			Attack(DeltaTime);
+			break;
 	
+		}
 	}
-
-	}
-
-
-	
 }
 
 void AZombie::FollowMyTarget(float deltaTime)
@@ -96,8 +91,6 @@ void AZombie::LookTowardsTarget()
 
 void AZombie::AvoidanceObstacles(float deltaTime)
 {
-
-	
 	if (!closestObstacle)
 	{
 		currentBehaviour = EBehaviours::Follow;
@@ -112,7 +105,6 @@ void AZombie::AvoidanceObstacles(float deltaTime)
 
 	SetActorRotation(Rot.Rotation());
 	SetActorLocation(GetActorLocation() + GetActorForwardVector() * MovementSpeed * deltaTime);
-
 }
 
 void AZombie::Attack(float deltaTime)
@@ -140,27 +132,28 @@ void AZombie::Attack(float deltaTime)
 }
 void AZombie::GetHit(int damage)
 {
-	Health -= damage;
-	_anim->ChangeHitValue(true);
-	UE_LOG(LogTemp, Warning, TEXT("%f"), HeathPercent);
-	HeathPercent = Health/100.0f;
-	UE_LOG(LogTemp, Warning, TEXT("%f"), HeathPercent);
-
-	if (Health <= 0)
+	if (Health > 0)
 	{
-		Health = 0;
-		Die();
-	}
-		
+		Health -= damage;
+		_anim->ChangeHitValue(true);
+		UE_LOG(LogTemp, Warning, TEXT("%f"), HeathPercent);
+		HeathPercent = Health/100.0f;
+		UE_LOG(LogTemp, Warning, TEXT("%f"), HeathPercent);
 
+		if (Health <= 0)
+		{
+			Health = 0;
+			Die();
+		}
+	}
 }
 
 void AZombie::Die()
 {
 	_anim->ChangeLifeValue(true);
 	IsDead = true;
+	_gamemode->AddPoints(100);
 	GetWorld()->GetTimerManager().SetTimer(timerDead, this , &AZombie::DestroyDead, 10.0f , false);
-	
 }
 void AZombie::DestroyDead()
 {
@@ -184,7 +177,6 @@ void AZombie::raycastAttack()
 		CharacterHit->GetHit(Damage);
 		//UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
 	}
-	
 }
 
 
