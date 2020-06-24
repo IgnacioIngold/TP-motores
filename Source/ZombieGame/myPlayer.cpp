@@ -89,11 +89,16 @@ void AmyPlayer::RotatePlayer(float rot)
 
 void AmyPlayer::StartShooting()
 {
+	GetWorld()->GetTimerManager().SetTimer(_ShootCooldown,this, &AmyPlayer::Shoot, ShootCadency, true, 0.0f);
+}
+
+void AmyPlayer::Shoot()
+{
 	if (this->TestLocator != nullptr && health > 0)
 	{
 		FTransform position = this->TestLocator->GetComponentTransform();
 		/*UE_LOG(LogTemp, Warning, TEXT("Disparo desde código, la referencia del locator esta seteada :D"));*/
-	
+
 		if (AmmoInMagazine > 0)
 		{
 			UWorld* const World = GetWorld();
@@ -127,6 +132,7 @@ void AmyPlayer::StartShooting()
 
 void AmyPlayer::StopShooting()
 {
+	GetWorld()->GetTimerManager().ClearTimer(_ShootCooldown);
 	if (this->animController != NULL)
 	{
 		this->animController->isShooting = false;
@@ -232,7 +238,10 @@ void AmyPlayer::AddExtraMagazineSlots(int extraBullets)
 
 void AmyPlayer::Die() 
 {
-	animController->isDead = true;
+	if (animController != nullptr)
+	{
+		animController->isDead = true;
+	}
 
 	if (_gameMode)
 	{
@@ -242,8 +251,11 @@ void AmyPlayer::Die()
 
 void AmyPlayer::RespawnPlayer()
 {
-	animController->isDead = false;
-	health = MaxHealth;
+	if (animController != nullptr)
+	{
+		animController->isDead = false;
+		health = MaxHealth;
+	}
 }
 
 void AmyPlayer::GetAndLoadWeapon()

@@ -34,9 +34,6 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		int RespawnTimeRemaining = 5;
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UUserWidget* NormalGameWidget;*/
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UUserWidget> RespawnWidget;
 
