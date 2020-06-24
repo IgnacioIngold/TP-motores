@@ -5,6 +5,8 @@
 
 void UZG_GameInstance::ResetData()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Data Reseted"));
+
 	AcumulatedPoints = 0;
 	TimeSurvived = 0;
 }

@@ -72,15 +72,14 @@ void AZG_GameModeBase::RespawnCallBack()
 void AZG_GameModeBase::RespawnPlayer()
 {
 	//Respawneamos al player.
-	if (DefaultPlayerStart)
+	if (DefaultPlayerStart != nullptr)
 	{
-		auto player = GetWorld()->GetFirstPlayerController()->GetPawn();
-		player->SetActorTransform(DefaultPlayerStart->GetTransform());
+		AmyPlayer* player = Cast<AmyPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
-		auto mp = Cast<AmyPlayer>(player);
-		if (mp)
+		if (player != nullptr)
 		{
-			mp->RespawnPlayer();
+			player->SetActorTransform(DefaultPlayerStart->GetActorTransform());
+			player->RespawnPlayer();
 		}
 	}
 	if (_respawnWidgetInstance)

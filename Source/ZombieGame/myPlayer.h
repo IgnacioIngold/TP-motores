@@ -52,6 +52,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
 		int MaxAmmoInMagazine = 30;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
+		float ShootCadency = 0.1f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class ABullet> prefabBullet;
 
@@ -59,6 +62,9 @@ public:
 private:
 
 	AZG_GameModeBase* _gameMode;
+	FTimerHandle _ShootCooldown;
+
+	void Shoot();
 
 public:
 	//Funciones:
@@ -89,6 +95,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void ShootWithPositionAndRotation(FVector position, FRotator rotation);
-
-	void TestLoadWinLevel();
 };
