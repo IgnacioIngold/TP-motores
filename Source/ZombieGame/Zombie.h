@@ -103,6 +103,8 @@ protected:
 
 	bool AttackPerform;
 
+	float distanceToTarget;
+
 
 
 public:	

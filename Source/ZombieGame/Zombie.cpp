@@ -49,6 +49,7 @@ void AZombie::Tick(float DeltaTime)
 	
 		}
 	}
+	distanceToTarget = dir.Size();
 }
 
 void AZombie::FollowMyTarget(float deltaTime)
@@ -64,7 +65,7 @@ void AZombie::FollowMyTarget(float deltaTime)
 	}
 
 	
-	float distanceToTarget = dir.Size();
+	
 	
 	if (distanceToTarget <= AttackRange)
 	{
@@ -106,7 +107,7 @@ void AZombie::AvoidanceObstacles(float deltaTime)
 
 	SetActorRotation(Rot.Rotation());
 	SetActorLocation(GetActorLocation() + GetActorForwardVector() * MovementSpeed * deltaTime);
-	float distanceToTarget = dir.Size();
+	
 	if (distanceToTarget <= AttackRange)
 	{
 		AttackPerform = false;
@@ -189,37 +190,31 @@ void AZombie::DestroyDead()
 
 void AZombie::raycastAttack()
 {
-//	FHitResult hit;
-//
-//	FCollisionQueryParams p = FCollisionQueryParams(TEXT(""), false, this);
-//	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation()+GetActorForwardVector() * 150, ECollisionChannel::ECC_PhysicsBody, p);
-//	if (hit.GetActor())
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("%s"), *hit.GetActor()->GetName());
-//	}
-//	AmyPlayer* CharacterHit = Cast<AmyPlayer>(hit.GetActor());
-//	if (CharacterHit)
-//	{
-//		CharacterHit->GetHit(Damage);
-//		//UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
-//	}
-	FHitResult hit;
+	if (distanceToTarget <= AttackRange + 100)
+	{
+		AmyPlayer* CharacterHit = Cast<AmyPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
+		if (CharacterHit != nullptr)
+			{
+					CharacterHit->GetHit(Damage);
+			}
+	}
+	//FHitResult hit;
 
-	FCollisionQueryParams p = FCollisionQueryParams(TEXT(""), false, this);
-	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 150, ECollisionChannel::ECC_PhysicsBody, p);
-	if (hit.GetActor())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *hit.GetActor()->GetName());
-	}
-	AmyPlayer* CharacterHit = Cast<AmyPlayer>(hit.GetActor());
-	if (CharacterHit != nullptr)
-	{
-		if (CharacterHit)
-		{
-			CharacterHit->GetHit(Damage);
-			//UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
-		}
-	}
+	//FCollisionQueryParams p = FCollisionQueryParams(TEXT(""), false, this);
+	//GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 150, ECollisionChannel::ECC_PhysicsBody, p);
+	//if (hit.GetActor())
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("%s"), *hit.GetActor()->GetName());
+	//}
+	//AmyPlayer* CharacterHit = Cast<AmyPlayer>(hit.GetActor());
+	//if (CharacterHit != nullptr)
+	//{
+	//	if (CharacterHit)
+	//	{
+	//		CharacterHit->GetHit(Damage);
+	//		//UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
+	//	}
+	//}
 }
 
 
