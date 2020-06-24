@@ -106,6 +106,14 @@ void AZombie::AvoidanceObstacles(float deltaTime)
 
 	SetActorRotation(Rot.Rotation());
 	SetActorLocation(GetActorLocation() + GetActorForwardVector() * MovementSpeed * deltaTime);
+	float distanceToTarget = dir.Size();
+	if (distanceToTarget <= AttackRange)
+	{
+		AttackPerform = false;
+		timeAttack = attackDuration;
+		currentBehaviour = EBehaviours::Attack;
+
+	}
 }
 
 void AZombie::Attack(float deltaTime)
@@ -121,14 +129,19 @@ void AZombie::Attack(float deltaTime)
 		raycastAttack();
 	}
 	
-	if (_anim->Attaking == false && timeAttack<=0)
+	if (_anim != nullptr)
 	{
-		
-		currentBehaviour = EBehaviours::Follow;
-		return;
+		if (_anim->Attaking == false && timeAttack <= 0)
+		{
+
+			currentBehaviour = EBehaviours::Follow;
+			return;
+		}
 	}
 
 	_anim->ChangeAttackValue(true);
+	
+
 	
 }
 void AZombie::GetHit(int damage)
@@ -176,19 +189,36 @@ void AZombie::DestroyDead()
 
 void AZombie::raycastAttack()
 {
+//	FHitResult hit;
+//
+//	FCollisionQueryParams p = FCollisionQueryParams(TEXT(""), false, this);
+//	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation()+GetActorForwardVector() * 150, ECollisionChannel::ECC_PhysicsBody, p);
+//	if (hit.GetActor())
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("%s"), *hit.GetActor()->GetName());
+//	}
+//	AmyPlayer* CharacterHit = Cast<AmyPlayer>(hit.GetActor());
+//	if (CharacterHit)
+//	{
+//		CharacterHit->GetHit(Damage);
+//		//UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
+//	}
 	FHitResult hit;
 
 	FCollisionQueryParams p = FCollisionQueryParams(TEXT(""), false, this);
-	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation()+GetActorForwardVector() * 150, ECollisionChannel::ECC_PhysicsBody, p);
+	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 150, ECollisionChannel::ECC_PhysicsBody, p);
 	if (hit.GetActor())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *hit.GetActor()->GetName());
 	}
 	AmyPlayer* CharacterHit = Cast<AmyPlayer>(hit.GetActor());
-	if (CharacterHit)
+	if (CharacterHit != nullptr)
 	{
-		CharacterHit->GetHit(Damage);
-		//UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
+		if (CharacterHit)
+		{
+			CharacterHit->GetHit(Damage);
+			//UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
+		}
 	}
 }
 
