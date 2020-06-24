@@ -78,7 +78,7 @@ void AZG_GameModeBase::RespawnPlayer()
 
 		if (player != nullptr)
 		{
-			player->SetActorTransform(DefaultPlayerStart->GetActorTransform());
+			player->SetActorLocation(DefaultPlayerStart->GetActorTransform().GetLocation());
 			player->RespawnPlayer();
 		}
 	}

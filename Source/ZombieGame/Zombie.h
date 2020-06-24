@@ -86,9 +86,10 @@ public:
 	FTimerHandle timerDead;
 
 
-
-	UAnimI_Zombie* _anim;
-	AZG_GameModeBase* _gamemode;
+	UPROPERTY()
+		UAnimI_Zombie* _anim;
+	UPROPERTY()
+		AZG_GameModeBase* _gamemode;
 
 protected:
 	// Called when the game starts or when spawned

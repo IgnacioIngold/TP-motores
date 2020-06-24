@@ -42,12 +42,15 @@ public:
 
 private:
 
-	UWorld* _currentWorld;
+	UPROPERTY()
+		UWorld* _currentWorld;
+	UPROPERTY()
+		UUserWidget* _respawnWidgetInstance;
+	UPROPERTY()
+		UUserWidget* _playerHUDWigetInstance;
+
 	FString _currentLevel;
 	FTimerHandle respawnFeedBack;
-
-	UUserWidget* _respawnWidgetInstance;
-	UUserWidget* _playerHUDWigetInstance;
 
 public:
 	void StartPlay() override;

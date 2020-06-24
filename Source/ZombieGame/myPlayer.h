@@ -66,7 +66,9 @@ public:
 
 private:
 
-	AZG_GameModeBase* _gameMode;
+	UPROPERTY()
+		AZG_GameModeBase* _gameMode;
+	
 	FTimerHandle _ShootCooldown;
 
 	void Shoot();
