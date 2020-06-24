@@ -55,6 +55,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class ABullet> prefabBullet;
 
+	UPROPERTY()
+		UAudioComponent* myAudioComp;
+	UPROPERTY(EditAnyWhere)
+		USoundCue* myShootCue;
+
 
 private:
 

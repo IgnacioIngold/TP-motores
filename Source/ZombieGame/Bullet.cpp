@@ -6,7 +6,7 @@
 // Sets default values
 ABullet::ABullet()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -34,13 +34,24 @@ void ABullet::SelfDestruction()
 	Destroy();
 }
 
-void ABullet::CheckCollision(AActor* otherActor)
+void ABullet::CheckCollision(AActor* otherActor, UPrimitiveComponent* compCollision)
 {
 	auto zombie = Cast<AZombie>(otherActor);
-	if(zombie)
+	if (zombie != nullptr)
 	{
-		zombie->GetHit(dmg);
+		UCapsuleComponent* myzombie;
+		myzombie = zombie->FindComponentByClass<UCapsuleComponent>();
+		if (myzombie != nullptr)
+		{
+			if (zombie && compCollision == myzombie)
+			{
+				zombie->GetHit(dmg);
+				SelfDestruction();
+			}
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("NULL : CapsuleComponentZombie"));
 	}
+	else UE_LOG(LogTemp, Warning, TEXT("NULL : Zombie"));
 }
 
 

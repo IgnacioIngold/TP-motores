@@ -32,6 +32,8 @@ void AmyPlayer::BeginPlay()
 	{
 		_gameMode = gm;
 	}
+
+	myAudioComp = FindComponentByClass<UAudioComponent>();
 }
 
 // Called every frame
@@ -105,6 +107,14 @@ void AmyPlayer::StartShooting()
 				if (this->animController != NULL)
 				{
 					this->animController->isShooting = true;
+				}
+				if (myAudioComp)
+				{
+					myAudioComp->Stop();
+
+					if (myShootCue)
+						myAudioComp->SetSound(myShootCue);
+					myAudioComp->Play();
 				}
 			}
 		}

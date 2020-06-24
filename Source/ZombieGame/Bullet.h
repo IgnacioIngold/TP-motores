@@ -32,8 +32,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void TimerToDestruction();
-	void SelfDestruction();
+
+	UFUNCTION(BlueprintCallable)
+		void SelfDestruction();
 	
 	UFUNCTION(BlueprintCallable)
-		void CheckCollision(AActor* otherActor);
+		void CheckCollision(AActor* otherActor, UPrimitiveComponent* compCollision);
 };

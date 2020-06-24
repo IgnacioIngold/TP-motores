@@ -27,7 +27,16 @@ public:
 	// Sets default values for this actor's properties
 	AZombie();
 
+	UPROPERTY()
+		UAudioComponent* myAudioComp;
 
+
+	UPROPERTY(EditAnyWhere)
+		USoundCue* dieCue;
+	UPROPERTY(EditAnywhere)
+		USoundCue * attackCue;
+	UPROPERTY(EditAnywhere)
+		USoundCue* chaseCue;
 
 	UPROPERTY(VisibleAnywhere)
 		AActor * target;

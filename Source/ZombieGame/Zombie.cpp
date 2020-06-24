@@ -19,7 +19,7 @@ void AZombie::BeginPlay()
 	currentBehaviour = EBehaviours::Follow;
 	timeAttack = attackDuration;
 	_anim = Cast<UAnimI_Zombie>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
-	
+	myAudioComp = FindComponentByClass<UAudioComponent>();
 }
 
 // Called every frame
@@ -157,6 +157,18 @@ void AZombie::GetHit(int damage)
 
 void AZombie::Die()
 {
+	bool enterOneTime;
+	enterOneTime = true;
+	if (myAudioComp && enterOneTime)
+	{
+		enterOneTime = false;
+		myAudioComp->Stop();
+
+		if (dieCue)
+			myAudioComp->SetSound(dieCue);
+			myAudioComp->Play();
+	}
+
 	_anim->ChangeLifeValue(true);
 	IsDead = true;
 	GetWorld()->GetTimerManager().SetTimer(timerDead, this , &AZombie::DestroyDead, 10.0f , false);
