@@ -7,6 +7,7 @@
 #include "AnimI_Zombie.h"
 #include "myPlayer.h"
 #include "GameFramework/Actor.h"
+#include "ZG_GameModeBase.h"
 #include "Zombie.generated.h"
 
 UENUM(BlueprintType)

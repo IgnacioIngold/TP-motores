@@ -173,8 +173,16 @@ void AZombie::Die()
 		myAudioComp->Stop();
 
 		if (dieCue)
+		{
 			myAudioComp->SetSound(dieCue);
 			myAudioComp->Play();
+		}
+
+		AZG_GameModeBase* gameMode = Cast<AZG_GameModeBase>(GetWorld()->GetAuthGameMode());
+		if (gameMode != nullptr)
+		{
+			gameMode->ZombieDied();
+		}
 	}
 
 	_anim->ChangeLifeValue(true);

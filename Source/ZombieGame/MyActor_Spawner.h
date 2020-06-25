@@ -8,6 +8,8 @@
 #include "GameFramework/Actor.h"
 #include "MyActor_Spawner.generated.h"
 
+class AZG_GameModeBase;
+
 UCLASS()
 class ZOMBIEGAME_API AMyActor_Spawner : public AActor
 {

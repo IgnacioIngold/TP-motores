@@ -96,3 +96,18 @@ void AZG_GameModeBase::AddPlayerHudToScene()
 	}
 }
 
+void AZG_GameModeBase::ZombieSpawned()
+{
+	_CurrentZombieSpawnedAmmount++;
+}
+
+void AZG_GameModeBase::ZombieDied()
+{
+	_CurrentZombieSpawnedAmmount--;
+}
+
+bool AZG_GameModeBase::CanSpawnNewZombies()
+{
+	return _CurrentZombieSpawnedAmmount + 1 <= ZombieSpawnLimit;
+}
+

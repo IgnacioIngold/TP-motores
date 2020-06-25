@@ -2,6 +2,7 @@
 
 
 #include "MyActor_Spawner.h"
+#include "ZG_GameModeBase.h"
 
 // Sets default values
 AMyActor_Spawner::AMyActor_Spawner()
@@ -26,10 +27,19 @@ void AMyActor_Spawner::Tick(float DeltaTime)
 
 void AMyActor_Spawner::SpawnZombie()
 {
-	if(prefabZombie)
+	AZG_GameModeBase* baseGameMode = Cast<AZG_GameModeBase>(GetWorld()->GetAuthGameMode());
+	if(prefabZombie && baseGameMode != nullptr)
 	{
-		FActorSpawnParameters p;
-		GetWorld()->SpawnActor<AZombie>(prefabZombie, GetActorLocation(), GetActorRotation(), p);
+		if (baseGameMode->CanSpawnNewZombies())
+		{
+			FActorSpawnParameters p;
+			GetWorld()->SpawnActor<AZombie>(prefabZombie, GetActorLocation(), GetActorRotation(), p);
+			baseGameMode->ZombieSpawned();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MyActorSpawner::SpawnZombie()::No se pueden spawnear mas zombies debido al límite máximo!"));
+		}
 	}
 }
 

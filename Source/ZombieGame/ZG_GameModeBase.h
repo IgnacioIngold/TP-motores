@@ -34,6 +34,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		int RespawnTimeRemaining = 5;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int ZombieSpawnLimit = 200;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UUserWidget> RespawnWidget;
 
@@ -49,6 +52,9 @@ private:
 	UPROPERTY()
 		UUserWidget* _playerHUDWigetInstance;
 
+	UPROPERTY()
+		int _CurrentZombieSpawnedAmmount = 0;
+
 	FString _currentLevel;
 	FTimerHandle respawnFeedBack;
 
@@ -63,4 +69,7 @@ public:
 	void PlayerDied();
 	void RespawnCallBack();
 	void RespawnPlayer();
+	void ZombieDied();
+	void ZombieSpawned();
+	bool CanSpawnNewZombies();
 };
