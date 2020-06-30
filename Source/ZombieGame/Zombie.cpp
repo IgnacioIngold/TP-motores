@@ -16,7 +16,7 @@ void AZombie::BeginPlay()
 	Super::BeginPlay();
 
 	target = GetWorld()->GetFirstPlayerController()->GetPawn();
-	currentBehaviour = EBehaviours::Follow;
+	currentBehaviour = EBehaviours::Avoidance;
 	timeAttack = attackDuration;
 	_anim = Cast<UAnimI_Zombie>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
 	myAudioComp = FindComponentByClass<UAudioComponent>();
