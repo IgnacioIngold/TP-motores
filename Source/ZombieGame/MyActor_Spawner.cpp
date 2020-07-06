@@ -36,10 +36,10 @@ void AMyActor_Spawner::SpawnZombie()
 			GetWorld()->SpawnActor<AZombie>(prefabZombie, GetActorLocation(), GetActorRotation(), p);
 			baseGameMode->ZombieSpawned();
 		}
-		else
+		/*else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("MyActorSpawner::SpawnZombie()::No se pueden spawnear mas zombies debido al límite máximo!"));
-		}
+		}*/
 	}
 }
 

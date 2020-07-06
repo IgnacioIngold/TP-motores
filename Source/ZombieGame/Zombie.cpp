@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Zombie.h"
-#include "ZG_GameModeBase.h"
 
 // Sets default values
 AZombie::AZombie()
@@ -33,20 +32,28 @@ void AZombie::Tick(float DeltaTime)
 	{
 		switch (currentBehaviour)
 		{
+			case EBehaviours::Follow:
+				FollowMyTarget(DeltaTime);
+				break;
+			case EBehaviours::LookTarget:
+				LookTowardsTarget();
+				break;
+			case EBehaviours::Avoidance:
+				AvoidanceObstacles(DeltaTime);
+				break;
+			case EBehaviours::Attack:
+				Attack(DeltaTime);
+				break;
+		}
 
-		case EBehaviours::Follow:
-			FollowMyTarget(DeltaTime);
-			break;
-		case EBehaviours::LookTarget:
-			LookTowardsTarget();
-			break;
-		case EBehaviours::Avoidance:
-			AvoidanceObstacles(DeltaTime);
-			break;
-		case EBehaviours::Attack:
-			Attack(DeltaTime);
-			break;
-	
+		if (currentBehaviour == EBehaviours::Follow || currentBehaviour == EBehaviours::Avoidance)
+		{
+			if (myAudioComp && chaseCue && myAudioComp->Sound != chaseCue)
+			{
+				myAudioComp->Stop();
+				myAudioComp->SetSound(chaseCue);
+				myAudioComp->Play();
+			}
 		}
 	}
 	distanceToTarget = dir.Size();
@@ -56,34 +63,23 @@ void AZombie::FollowMyTarget(float deltaTime)
 {
 	//Me muevo en direcci�n a mi objetivo.
 	LookTowardsTarget();
-	
 
 	if (closestObstacle)
 	{
 		currentBehaviour = EBehaviours::Avoidance;
-
 	}
 
-	
-	
-	
 	if (distanceToTarget <= AttackRange)
 	{
 		//Si el enemigo entra en rango de Combate. Se detiene.
-
-		
 		AttackPerform = false;
 		timeAttack = attackDuration;
 		currentBehaviour = EBehaviours::Attack;
-		
 	}
 	else
 	{
-		//Si el enemigo no tiene dentro del rango al Player.
-		
 		SetActorLocation(GetActorLocation() + GetActorForwardVector()*MovementSpeed*deltaTime);
 	}
-
 }
 
 void AZombie::LookTowardsTarget()
@@ -113,15 +109,12 @@ void AZombie::AvoidanceObstacles(float deltaTime)
 		AttackPerform = false;
 		timeAttack = attackDuration;
 		currentBehaviour = EBehaviours::Attack;
-
 	}
 }
 
 void AZombie::Attack(float deltaTime)
 {
 	LookTowardsTarget();
-	
-
 	timeAttack -= deltaTime;
 	
 	if (timeAttack <= 0.854f && AttackPerform == false)
@@ -134,16 +127,12 @@ void AZombie::Attack(float deltaTime)
 	{
 		if (_anim->Attaking == false && timeAttack <= 0)
 		{
-
 			currentBehaviour = EBehaviours::Follow;
 			return;
 		}
 	}
 
 	_anim->ChangeAttackValue(true);
-	
-
-	
 }
 void AZombie::GetHit(int damage)
 {
@@ -151,9 +140,8 @@ void AZombie::GetHit(int damage)
 	{
 		Health -= damage;
 		_anim->ChangeHitValue(true);
-		UE_LOG(LogTemp, Warning, TEXT("%f"), HeathPercent);
 		HeathPercent = Health/100.0f;
-		UE_LOG(LogTemp, Warning, TEXT("%f"), HeathPercent);
+		//UE_LOG(LogTemp, Warning, TEXT("AZombie::GetHit::Daño recibido: %i, porcentaje de vida restante: %f."), damage, HeathPercent);
 
 		if (Health <= 0)
 		{
@@ -178,10 +166,9 @@ void AZombie::Die()
 			myAudioComp->Play();
 		}
 
-		AZG_GameModeBase* gameMode = Cast<AZG_GameModeBase>(GetWorld()->GetAuthGameMode());
-		if (gameMode != nullptr)
+		if (_gamemode != nullptr)
 		{
-			gameMode->ZombieDied();
+			_gamemode->ZombieDied();
 		}
 	}
 
@@ -200,29 +187,19 @@ void AZombie::raycastAttack()
 {
 	if (distanceToTarget <= AttackRange + 100)
 	{
+		if (myAudioComp && attackCue)
+		{
+			myAudioComp->Stop();
+			myAudioComp->SetSound(attackCue);
+			myAudioComp->Play();
+		}
+
 		AmyPlayer* CharacterHit = Cast<AmyPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		if (CharacterHit != nullptr)
 			{
-					CharacterHit->GetHit(Damage);
+				CharacterHit->GetHit(Damage);
 			}
 	}
-	//FHitResult hit;
-
-	//FCollisionQueryParams p = FCollisionQueryParams(TEXT(""), false, this);
-	//GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 150, ECollisionChannel::ECC_PhysicsBody, p);
-	//if (hit.GetActor())
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("%s"), *hit.GetActor()->GetName());
-	//}
-	//AmyPlayer* CharacterHit = Cast<AmyPlayer>(hit.GetActor());
-	//if (CharacterHit != nullptr)
-	//{
-	//	if (CharacterHit)
-	//	{
-	//		CharacterHit->GetHit(Damage);
-	//		//UE_LOG(LogTemp, Warning, TEXT("toma broh, flores y rosas"));
-	//	}
-	//}
 }
 
 
@@ -250,4 +227,41 @@ void AZombie::myEndOverlap(AActor* ActorOverlap)
 	}
 }
 
+void AZombie::BodyCollisionHandler(AActor* other, int bodyPart)
+{
+	ABullet* bullet = Cast<ABullet>(other);
+	if (bullet == nullptr) return;
+
+	FString Part = "";
+	switch (bodyPart)
+	{
+	case 0:
+		Part = "Torso";
+		if (_gamemode)
+			_gamemode->AddPoints(pointsForHitTorso);
+		GetHit(DamageForHitTorso);
+		break;
+
+	case  1:
+		Part = "Left Arm";
+		if (_gamemode)
+			_gamemode->AddPoints(pointsForHitLeftArm);
+		GetHit(DamageForHitLeftArm);
+		break;
+
+	case 2:
+		Part = "Right Arm";
+		if (_gamemode)
+			_gamemode->AddPoints(pointsForHitRightArm);
+		GetHit(DamageForHitRightArm);
+		break;
+
+	default:
+		Part = "Invalid!";
+		break;
+	}
+
+	other->Destroy();
+	//UE_LOG(LogTemp, Warning, TEXT("Collisionó la wea en: %s"), *Part);
+}
 

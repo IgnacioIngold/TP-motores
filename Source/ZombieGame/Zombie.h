@@ -19,8 +19,6 @@ enum class EBehaviours : uint8
 	Attack UMETA(DisplayName = "Attacking")
 };
 
-class AZG_GameModeBase;
-
 UCLASS()
 class ZOMBIEGAME_API AZombie : public AActor
 {
@@ -33,8 +31,7 @@ public:
 	UPROPERTY()
 		UAudioComponent* myAudioComp;
 
-
-	UPROPERTY(EditAnyWhere)
+	UPROPERTY(EditAnywhere)
 		USoundCue* dieCue;
 	UPROPERTY(EditAnywhere)
 		USoundCue * attackCue;
@@ -50,11 +47,39 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		float Health;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float AttackRange;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float WeightAvoid;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float attackDuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float speedRot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		int Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		float MovementSpeed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Stats")
 		float HeathPercent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "BodyCollision")
+		float DamageForHitTorso = 15;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "BodyCollision")
+		float DamageForHitLeftArm = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "BodyCollision")
+		float DamageForHitRightArm = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "BodyCollision")
+		int pointsForHitTorso = 15;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "BodyCollision")
+		int pointsForHitLeftArm = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "BodyCollision")
+		int pointsForHitRightArm = 5;
 
 	//Pasa a ataque si está atacando.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation Controllers")
@@ -66,26 +91,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation Controllers")
 		bool IsDead;
 
-	UPROPERTY(EditAnywhere)
-		float AttackRange;
-
-	UPROPERTY(EditAnywhere)
-		float WeightAvoid;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		AActor* closestObstacle;
-	
-	UPROPERTY(EditAnywhere)
-		float attackDuration;
-
-	UPROPERTY(EditAnywhere)
-		float speedRot;
-
-	UPROPERTY(EditAnywhere)
-		int Damage;
 
 	FTimerHandle timerDead;
-
 
 	UPROPERTY()
 		UAnimI_Zombie* _anim;
@@ -105,8 +114,6 @@ protected:
 	bool AttackPerform;
 
 	float distanceToTarget;
-
-
 
 public:	
 	// Called every frame
@@ -131,7 +138,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void myEndOverlap(AActor* ActorOverlap);
 
+	UFUNCTION(BlueprintCallable)
+		void BodyCollisionHandler(AActor* other, int bodyPart);
 
-	
-	
 };

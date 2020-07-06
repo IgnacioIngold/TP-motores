@@ -23,7 +23,7 @@ void AmyPlayer::BeginPlay()
 		if (animController)
 		{
 			animController->hasWeapon = true;
-			UE_LOG(LogTemp, Warning, TEXT("La referencia fue seteada correctamente"));
+			//UE_LOG(LogTemp, Warning, TEXT("La referencia fue seteada correctamente"));
 		}
 	}
 
@@ -43,9 +43,7 @@ void AmyPlayer::Tick(float DeltaTime)
 	/*UE_LOG(LogTemp, Warning, TEXT("Mi posici�n es %s y mi rotaci�n es %s"), *GetActorLocation().ToString(), *GetActorRotation().ToString());*/
 
 	if (health > 0)
-	{
-		_gameMode->GameTime += DeltaTime;
-	}
+		_gameMode->UpdateTrackedGameTime(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -136,7 +134,7 @@ void AmyPlayer::StopShooting()
 	if (this->animController != NULL)
 	{
 		this->animController->isShooting = false;
-		UE_LOG(LogTemp, Warning, TEXT("Stop Shooting :D"));
+		//UE_LOG(LogTemp, Warning, TEXT("Stop Shooting :D"));
 	}
 }
 
@@ -144,7 +142,7 @@ void AmyPlayer::ShootWithTransform(FTransform transform)
 {
 	if (AmmoInMagazine > 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Disparo desde Blueprint"));
+		//UE_LOG(LogTemp, Warning, TEXT("Disparo desde Blueprint"));
 
 		UWorld* const World = GetWorld();
 		if (World != NULL && prefabBullet != NULL)
@@ -160,17 +158,17 @@ void AmyPlayer::ShootWithTransform(FTransform transform)
 			}
 		}
 	}
-	else
+	/*else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Intentaste Disparar por Blueprint, pero no tenés mas balas... Recarga!"));
-	}
+	}*/
 }
 
 void AmyPlayer::ShootWithPositionAndRotation(FVector position, FRotator rotation)
 {
 	if (AmmoInMagazine > 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Disparo desde Blueprint"));
+		//UE_LOG(LogTemp, Warning, TEXT("Disparo desde Blueprint"));
 
 		UWorld* const World = GetWorld();
 		if (World != NULL && prefabBullet != NULL)
@@ -181,28 +179,28 @@ void AmyPlayer::ShootWithPositionAndRotation(FVector position, FRotator rotation
 			ABullet * bullet = World->SpawnActor<ABullet>(prefabBullet, position, rotation, spawnParams);
 		}
 	}
-	else
+	/*else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Intentaste Disparar por Blueprint, pero no tenés mas balas... Recarga!"));
-	}
+	}*/
 }
 
 void AmyPlayer::Jump()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Salto we"));
+	//UE_LOG(LogTemp, Warning, TEXT("Salto we"));
 }
 
 void AmyPlayer::Reload()
 {
 	if (Ammo <= 0) 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No hay suficientes balas en la reserva"));
+		//UE_LOG(LogTemp, Warning, TEXT("No hay suficientes balas en la reserva"));
 		return;
 	}
 
 	if (AmmoInMagazine < MaxAmmoInMagazine)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Recargo we"));
+		//UE_LOG(LogTemp, Warning, TEXT("Recargo we"));
 		//Primero me fijo cuantas balas me faltan para completar el máximo.
 		int faltantes = MaxAmmoInMagazine - AmmoInMagazine;
 		int añadibles = 0;
@@ -220,19 +218,21 @@ void AmyPlayer::Reload()
 
 void AmyPlayer::AddBulletsToBackPack(int Bullets)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Balas pickeadas!! Se añadieron %s balas al BackPack."), Bullets);
+	//UE_LOG(LogTemp, Warning, TEXT("Balas pickeadas!! Se añadieron %s balas al BackPack."), Bullets);
 	Ammo += Bullets;
 }
 
 void AmyPlayer::Heal(int Ammount)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Vida regenerada!! Se añadieron %s puntos de vida."), Ammount);
 	health += Ammount;
+	if (health > MaxHealth)
+		health = MaxHealth;
+	//UE_LOG(LogTemp, Warning, TEXT("Vida regenerada!! Se añadieron %i puntos de vida."), Ammount);
 }
 
 void AmyPlayer::AddExtraMagazineSlots(int extraBullets)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Magazine extendido!!, Se añadieron %s espacios para balas extra."), extraBullets);
+	//UE_LOG(LogTemp, Warning, TEXT("Magazine extendido!!, Se añadieron %s espacios para balas extra."), extraBullets);
 	MaxAmmoInMagazine += extraBullets;
 }
 
@@ -272,7 +272,7 @@ void AmyPlayer::GetHit(int Damage)
 	{
 		//Pos me meten la verga :v
 		health -= Damage;
-		UE_LOG(LogTemp, Warning, TEXT("Recibí Daño, vida restante es: %i"), health);
+		//UE_LOG(LogTemp, Warning, TEXT("Recibí Daño, vida restante es: %i"), health);
 
 		if (health <= 0)
 		{

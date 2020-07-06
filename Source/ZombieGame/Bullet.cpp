@@ -36,21 +36,9 @@ void ABullet::SelfDestruction()
 
 void ABullet::CheckCollision(AActor* otherActor, UPrimitiveComponent* compCollision)
 {
-	auto zombie = Cast<AZombie>(otherActor);
+	/*auto zombie = Cast<AZombie>(otherActor);
 	if (zombie != nullptr)
 	{
-		/*UCapsuleComponent* myzombie;
-		
-		myzombie = zombie->FindComponentByClass<UCapsuleComponent>();
-		if (myzombie != nullptr)
-		{
-			if (zombie && compCollision == myzombie)
-			{
-				zombie->GetHit(dmg);
-				SelfDestruction();
-			}
-		}*/
-		
 		if (compCollision->IsA(UCapsuleComponent::StaticClass()))
 		{
 			zombie->GetHit(dmg);
@@ -61,10 +49,7 @@ void ABullet::CheckCollision(AActor* otherActor, UPrimitiveComponent* compCollis
 			zombie->GetHit(dmg/4);
 			SelfDestruction();
 		}
-
-		
-	}
-	
+	}*/
 }
 
 
