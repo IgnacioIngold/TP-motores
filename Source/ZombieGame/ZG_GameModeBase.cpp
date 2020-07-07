@@ -269,3 +269,9 @@ void AZG_GameModeBase::StartLevel()
 		GetWorld()->GetTimerManager().SetTimer(WaveStartCounter, this, &AZG_GameModeBase::WaveEndCallback, 1.0f, true, 0.0f);
 	}
 }
+
+void AZG_GameModeBase::LoadPreviousData(int acumulatedScore, float survivedTime)
+{
+	Score = acumulatedScore;
+	GameTime = survivedTime;
+}

@@ -142,6 +142,9 @@ public:
 		void SetLevelFlow(TArray<int> AmmountOfZombiesPerWave, TArray<int> ZombieSpawnLimitPerRound); //Permite que cada nivel pueda setear sus settings al inicio del mismo.
 	UFUNCTION(BlueprintCallable)
 		void StartLevel(); //LLamamos Start level desde el Level Blueprint cada vez que se carga un nuevo nivel.
+	UFUNCTION(BlueprintCallable)
+		void LoadPreviousData(int acumulatedScore, float survivedTime); //LLamamos esta función en cada nivel consecutivo del primero!
+
 	void LevelCompleted(); //Se llama al finalizar todas las Oleadas.
 	void EndGameCallback(); //Se llama cada 1 segundo al finalizar las oleadas: Muestra el resultado del nivel.
 };
