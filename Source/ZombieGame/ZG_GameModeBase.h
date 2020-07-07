@@ -72,6 +72,8 @@ public:
 		int TimeRemainingForNextWave = 0; //Tiempo restante para iniciar la siguiente oleada. En segundos.
 
 	//Level Flow.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName nextLevelPath = "";
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		int LevelStartDisplayTime = 10;//Tiempo para iniciar la Partida. En segundos.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
