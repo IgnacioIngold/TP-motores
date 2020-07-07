@@ -117,11 +117,6 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class AZombieSpit> prefabSpit;
-	
-	
-	FTimerHandle timerDead;
-
-	FTimerHandle timerSpit;
 
 	UPROPERTY()
 		UAnimI_Zombie* _anim;
@@ -129,6 +124,7 @@ public:
 		AZG_GameModeBase* _gamemode;
 
 	FTimerHandle timerDead;
+	FTimerHandle timerSpit;
 	FTimerHandle timerStartDisolve;
 	void SetDisolveOn();
 
