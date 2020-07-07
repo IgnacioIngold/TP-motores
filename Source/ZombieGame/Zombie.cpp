@@ -17,6 +17,7 @@ void AZombie::BeginPlay()
 	target = GetWorld()->GetFirstPlayerController()->GetPawn();
 	currentBehaviour = EBehaviours::Avoidance;
 	timeAttack = attackDuration;
+	SpitChecked = false;
 	_anim = Cast<UAnimI_Zombie>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
 	myAudioComp = FindComponentByClass<UAudioComponent>();
 	_gamemode = Cast<AZG_GameModeBase>(GetWorld()->GetAuthGameMode());
@@ -63,7 +64,10 @@ void AZombie::Tick(float DeltaTime)
 				break;
 			case EBehaviours::Attack:
 				Attack(DeltaTime);
-				break;
+				break; 
+			case EBehaviours::Spit:
+					Spit(DeltaTime);
+					break;
 		}
 
 		if (currentBehaviour == EBehaviours::Follow || currentBehaviour == EBehaviours::Avoidance)
@@ -77,7 +81,25 @@ void AZombie::Tick(float DeltaTime)
 		}
 	}
 	distanceToTarget = dir.Size();
+
+	if (distanceToTarget <= SpitRangeMax && distanceToTarget >= SpitRangeMin && !SpitChecked)
+	{
+		int result = rand() % 5 + 1;
+		
+		if (result == 1)
+		{
+			timeSpitting = SpitDuration;
+			currentBehaviour = EBehaviours::Spit;
+			
+		}
+		SpitChecked = true;
+		GetWorld()->GetTimerManager().SetTimer(timerSpit, this, &AZombie::ChangeSpitChecked, 5.0f, false);
+	}
+
 }
+
+
+
 
 void AZombie::FollowMyTarget(float deltaTime)
 {
@@ -105,6 +127,31 @@ void AZombie::FollowMyTarget(float deltaTime)
 void AZombie::LookTowardsTarget()
 {	
 	SetActorRotation(dir.Rotation());
+}
+
+void AZombie::ChangeSpitChecked()
+{
+	SpitChecked = false;
+}
+void AZombie::Spit(float deltaTime)
+{
+	LookTowardsTarget();
+	timeSpitting -= deltaTime;
+
+	if (timeSpitting <= SpitDuration - 1.321f && !SpitPerform)
+	{
+		SpitPerform=true;
+
+		FTransform position = this->SpitSpawner->GetComponentTransform();
+		AZombieSpit* bullet = GetWorld()->SpawnActor<AZombieSpit>(prefabSpit, position);
+	}
+	if (timeSpitting<=0)
+	{
+		currentBehaviour = EBehaviours::Follow;
+	}
+
+	_anim->ChangeSpitValue(true);
+
 }
 
 void AZombie::AvoidanceObstacles(float deltaTime)
@@ -154,6 +201,7 @@ void AZombie::Attack(float deltaTime)
 
 	_anim->ChangeAttackValue(true);
 }
+
 void AZombie::GetHit(int damage)
 {
 	if (Health > 0)
