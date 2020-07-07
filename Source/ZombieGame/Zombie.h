@@ -6,6 +6,7 @@
 #include "Engine/World.h"
 #include "AnimI_Zombie.h"
 #include "myPlayer.h"
+#include "ZombieSpit.h"
 #include "GameFramework/Actor.h"
 #include "ZG_GameModeBase.h"
 #include "Zombie.generated.h"
@@ -16,7 +17,8 @@ enum class EBehaviours : uint8
 	Follow UMETA(DisplayName = "FollowTarget"),
 	LookTarget UMETA(DisplayName = "Look at Target"),
 	Avoidance UMETA(DisplayName = "Avoid Obstacles"),
-	Attack UMETA(DisplayName = "Attacking")
+	Attack UMETA(DisplayName = "Attacking"),
+	Spit UMETA(DisplayName = "Spitting")
 };
 
 UCLASS()
@@ -49,12 +51,19 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		float AttackRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float SpitRangeMax;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float SpitRangeMin;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		float WeightAvoid;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		float attackDuration;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float SpitDuration;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		float speedRot;
@@ -93,8 +102,17 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		AActor* closestObstacle;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USceneComponent* SpitSpawner;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<class AZombieSpit> prefabSpit;
+	
+	
 	FTimerHandle timerDead;
+
+	FTimerHandle timerSpit;
 
 	UPROPERTY()
 		UAnimI_Zombie* _anim;
@@ -111,7 +129,13 @@ protected:
 
 	float timeAttack;
 
+	float timeSpitting;
+
 	bool AttackPerform;
+
+	bool SpitChecked;
+	
+	bool SpitPerform;
 
 	float distanceToTarget;
 
@@ -124,6 +148,8 @@ public:
 	void LookTowardsTarget();
 	void AvoidanceObstacles(float deltaTime);
 	void Attack(float deltaTime);
+	void Spit(float deltaTime);
+	void ChangeSpitChecked();
 	void GetHit(int Damage);
 	UFUNCTION(BlueprintCallable)
 	void Die();

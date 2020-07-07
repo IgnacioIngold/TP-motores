@@ -16,6 +16,9 @@ void AmyPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Slowed = false;
+	CurrentSpeed = MovementSpeed;
+
 	USkeletalMeshComponent* mySkeletalMesh = FindComponentByClass<USkeletalMeshComponent>();
 	if (mySkeletalMesh)
 	{
@@ -66,7 +69,7 @@ void AmyPlayer::MoveHorizontal(float HAxis)
 	if (health > 0)
 	{
 		this->animController->horizontalAxis = HAxis;
-		AddMovementInput(GetActorRightVector(), HAxis);
+		AddMovementInput(GetActorRightVector(), HAxis* CurrentSpeed);
 	}
 }
 
@@ -75,7 +78,7 @@ void AmyPlayer::MoveVertical(float VAxis)
 	if (health > 0)
 	{
 		this->animController->verticalAxis = VAxis;
-		AddMovementInput(GetActorForwardVector(), VAxis);
+		AddMovementInput(GetActorForwardVector(), VAxis* CurrentSpeed);
 	}
 }
 
@@ -280,5 +283,21 @@ void AmyPlayer::GetHit(int Damage)
 			Die();
 		}
 	}
+}
+
+void AmyPlayer::GetSlowed()
+{
+	if (!Slowed)
+	{
+	CurrentSpeed = MovementSpeed / 10;
+	Slowed = true;
+	GetWorld()->GetTimerManager().SetTimer(_SlowCooldown, this, &AmyPlayer::GetRecovered, 4.0f, false);
+	}
+}
+
+void AmyPlayer::GetRecovered()
+{
+	CurrentSpeed = MovementSpeed;
+	Slowed = false;
 }
 

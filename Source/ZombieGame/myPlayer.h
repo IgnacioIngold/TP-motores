@@ -54,6 +54,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
 		float ShootCadency = 0.1f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
+		float MovementSpeed = 1.0f;
+	
+		
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class ABullet> prefabBullet;
@@ -70,8 +75,14 @@ private:
 		AZG_GameModeBase* _gameMode;
 	
 	FTimerHandle _ShootCooldown;
+	FTimerHandle _SlowCooldown;
+
+	float CurrentSpeed;
+	
+	bool Slowed;
 
 	void Shoot();
+
 
 public:
 	//Funciones:
@@ -87,6 +98,8 @@ public:
 	void RespawnPlayer();             // Función que llamamos para avisarle al player que se resetee.
 	void GetAndLoadWeapon();          //Función que llamamos al obtener un arma.
 	void GetHit(int Damage);
+	void GetSlowed();
+	void GetRecovered();
 	
 	UFUNCTION(BlueprintCallable)
 		void Heal(int Ammount);

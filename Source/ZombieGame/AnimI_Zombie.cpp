@@ -16,3 +16,8 @@ void UAnimI_Zombie::ChangeLifeValue(bool value)
 	Die = value;
 }
 
+void UAnimI_Zombie::ChangeSpitValue(bool value)
+{
+	Spitting = value;
+}
+

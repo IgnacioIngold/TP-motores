@@ -21,6 +21,9 @@ public:
 		bool Die;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 		bool GetHited;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		bool Spitting;
 public:
 	
 	UFUNCTION(BlueprintCallable)
@@ -29,5 +32,7 @@ public:
 		void ChangeHitValue(bool value);
 	UFUNCTION(BlueprintCallable)
 		void ChangeLifeValue(bool value);
+	UFUNCTION(BlueprintCallable)
+		void ChangeSpitValue(bool value);
 	
 };
