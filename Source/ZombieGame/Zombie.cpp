@@ -20,12 +20,32 @@ void AZombie::BeginPlay()
 	_anim = Cast<UAnimI_Zombie>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
 	myAudioComp = FindComponentByClass<UAudioComponent>();
 	_gamemode = Cast<AZG_GameModeBase>(GetWorld()->GetAuthGameMode());
+
+	if (refMaterial)
+	{
+		DynMaterial = UMaterialInstanceDynamic::Create(refMaterial, this);
+		USkeletalMeshComponent * mySkeleton = FindComponentByClass<USkeletalMeshComponent>();
+		if (mySkeleton && DynMaterial)
+		{
+			mySkeleton->SetMaterial(0, DynMaterial);
+			mySkeleton->SetMaterial(1, DynMaterial);
+			mySkeleton->SetMaterial(2, DynMaterial);
+		}
+	}
 }
 
 // Called every frame
 void AZombie::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (fadeBody && DynMaterial)
+	{
+		/*FMaterialParameterInfo parameterInfo;*/
+		float currentValue = 0;
+		DynMaterial->GetScalarParameterValue(FName(TEXT("Dissolve")) , currentValue);
+		currentValue -= DeltaTime;
+		DynMaterial->SetScalarParameterValue("Dissolve", currentValue);
+	}
 
 	dir = target->GetActorLocation() - GetActorLocation();
 	if (!IsDead && !_anim->GetHited)
@@ -175,8 +195,14 @@ void AZombie::Die()
 	_anim->ChangeLifeValue(true);
 	IsDead = true;
 	_gamemode->AddPoints(100);
-	GetWorld()->GetTimerManager().SetTimer(timerDead, this , &AZombie::DestroyDead, 10.0f , false);
+	GetWorld()->GetTimerManager().SetTimer(timerStartDisolve, this, &AZombie::SetDisolveOn, 7.0, false);
+	GetWorld()->GetTimerManager().SetTimer(timerDead, this , &AZombie::DestroyDead, 10.0f, false);
 }
+void AZombie::SetDisolveOn()
+{
+	fadeBody = true;
+}
+
 void AZombie::DestroyDead()
 {
 	Destroy();
@@ -260,6 +286,17 @@ void AZombie::BodyCollisionHandler(AActor* other, int bodyPart)
 		Part = "Invalid!";
 		break;
 	}
+
+	//FQuat myForward = GetTransform().GetRotation();
+	FVector playerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+	FVector dirToPlayer = (playerLocation - this->GetActorLocation());
+
+	//FRotator rotation = GetTransform().Rotator();
+	FRotator rotation = dirToPlayer.Rotation();
+	FVector position = bullet->GetTransform().GetLocation();
+	//FTransform newTransform = FTransform(rotation, position, FVector::OneVector);
+
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFeedback,position, rotation, true);
 
 	other->Destroy();
 	//UE_LOG(LogTemp, Warning, TEXT("Collisionó la wea en: %s"), *Part);

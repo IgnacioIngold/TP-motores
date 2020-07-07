@@ -32,6 +32,15 @@ public:
 		UAudioComponent* myAudioComp;
 
 	UPROPERTY(EditAnywhere)
+		UParticleSystem * HitFeedback;
+	UPROPERTY(EditAnywhere)
+		UMaterialInterface * refMaterial;
+	UPROPERTY(VisibleAnywhere)
+		UMaterialInstanceDynamic * DynMaterial;
+	UPROPERTY()
+		bool fadeBody = false;
+
+	UPROPERTY(EditAnywhere)
 		USoundCue* dieCue;
 	UPROPERTY(EditAnywhere)
 		USoundCue * attackCue;
@@ -94,12 +103,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		AActor* closestObstacle;
 
-	FTimerHandle timerDead;
+private:
 
 	UPROPERTY()
 		UAnimI_Zombie* _anim;
 	UPROPERTY()
 		AZG_GameModeBase* _gamemode;
+
+	FTimerHandle timerDead;
+	FTimerHandle timerStartDisolve;
+	void SetDisolveOn();
 
 protected:
 	// Called when the game starts or when spawned

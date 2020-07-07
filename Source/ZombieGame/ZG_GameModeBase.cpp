@@ -225,7 +225,13 @@ void AZG_GameModeBase::EndGameCallback()
 		if (_levelEndWidgetInstance && _levelEndWidgetInstance->IsInViewport()) //Desactivo el widget del final de nivel!.
 			_levelEndWidgetInstance->RemoveFromViewport();
 		if (_currentWorld)
+		{
+			//Cargo la data resultante en el GameInstance.
+			UZG_GameInstance* gameInstance = Cast<UZG_GameInstance>(GetWorld()->GetGameInstance());
+			gameInstance->AcumulatedPoints = Score;
+			gameInstance->TimeSurvived = GameTime;
 			UGameplayStatics::OpenLevel(GetWorld(), "/Game/Levels/WinLevel", false);//Cargo la escena de Victoria. Por ahora.
+		}
 	}
 }
 
