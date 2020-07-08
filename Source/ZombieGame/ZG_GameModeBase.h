@@ -8,6 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ZG_GameInstance.h"
 #include "PlayerDefeatWidget.h"
+#include "SpawnManagerBase.h"
 #include "ZG_GameModeBase.generated.h"
 
 class AmyPlayer;
@@ -47,21 +48,23 @@ public:
 		TSubclassOf<class UUserWidget> WaveCompleteWidget; //HUD del player al completar una oleada
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UUserWidget> PlayerHUDWidget; //HUD normal del player.
-
-	UPROPERTY(BlueprintReadOnly)
-		int WaveNumber = 0;                       //Número de Oleada.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		int RemainingZombiesToEndCurrentWave = 0; //Zombies que faltan para que la oleada actual termine.
-	UPROPERTY(BlueprintReadOnly)
-		int TotalZombiesSpawnedInCurrentWave = 0; //Zombies spawneados en total desde que inició la oleada actual.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<class ASpawnManagerBase> _spawnManagerClass;
 	UPROPERTY(EditAnywhere)
-		bool spawnLock = true; //Si el spawneado de la oleada ha terminado.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		ASpawnManagerBase* _spawnManager;
+
+	UPROPERTY(BlueprintReadOnly, category = "GameFlow")
+		int WaveNumber = 0;                       //Número de Oleada.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "GameFlow")
+		int RemainingZombiesToEndCurrentWave = 0; //Zombies que faltan para que la oleada actual termine.
+	UPROPERTY(BlueprintReadOnly, category = "GameFlow")
+		int TotalZombiesSpawnedInCurrentWave = 0; //Zombies spawneados en total desde que inició la oleada actual.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, category = "GameFlow")
 		int SceneSpawnLimit = 200;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		TArray<int> zombiesPerRound; //Cantidad de zombies a spawnear en cada oleada. Usa .Num() para obtener el count!.
+		TArray<int> zombiesToKill; //Cantidad de zombies a eliminar para completar cada oleada. Usa .Num() para obtener el count!.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		TArray<int> waveSpawnLimits; //Límite de zombies activos en escena x cada oleada.
+		TArray<int> maxActiveZombiesInScenePerWave; //Límite máximo de zombies activos en escena.
 
 	//Wave Flow.
 	UPROPERTY(EditAnywhere)
@@ -100,6 +103,8 @@ private:
 
 	int _activeZombies = 0; //Zombies activos en escena.
 	bool lockTimeTrack = true; //El tiempo de supervivencia se cuenta mientras el lock sea falso o el Player este muerto.
+	UPROPERTY(EditAnywhere)
+		bool lockSpawning = true; //Bloqueo del spawn.
 
 	FString _currentLevel;
 	FTimerHandle respawnFeedBack;
@@ -134,12 +139,14 @@ public:
 	void WaveEndCallback(); //Hace un conteo, al final inicia la nueva oleada.
 	void WaveEnded(); //Se llama cuando el último zombie, correspondiente a la oleada actual muere (Wave End).
 	
-	void ZombieDied();
-	void ZombieSpawned();
+	void ZombieDied(bool willRespawn);     //Registra la acción de la muerte.
+	void ZombieSpawned(bool isReespawning);//Registra la acción del spawneo.
 	bool CanSpawnNewZombies();
+	AZombie* getRespawnableZombie();   //Retorna nullptr si el respawnManager No tiene zombies reespawneables.
+	void registerZombieToRespawnList(AZombie* reespawneable);//Registra en el respawnManager un zombie que puede ser reespawneable.
 
 	UFUNCTION(BlueprintCallable)
-		void SetLevelFlow(TArray<int> AmmountOfZombiesPerWave, TArray<int> ZombieSpawnLimitPerRound); //Permite que cada nivel pueda setear sus settings al inicio del mismo.
+		void SetLevelFlow(TArray<int> _ammountOfZombiesToKill, TArray<int> _maxActiveZombiesInScene); //Permite que cada nivel pueda setear sus settings al inicio del mismo.
 	UFUNCTION(BlueprintCallable)
 		void StartLevel(); //LLamamos Start level desde el Level Blueprint cada vez que se carga un nuevo nivel.
 	UFUNCTION(BlueprintCallable)

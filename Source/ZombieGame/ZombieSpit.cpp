@@ -36,10 +36,8 @@ void AZombieSpit::CheckCollision(AActor* otherActor, UPrimitiveComponent* compCo
 	if (P != nullptr)
 	{
 		P->GetSlowed();
+		P->GetHit(5);
 		Destroy();
 	}
-
-	
-	
 }
 

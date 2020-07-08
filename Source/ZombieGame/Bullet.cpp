@@ -14,7 +14,8 @@ ABullet::ABullet()
 void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
-	TimerToDestruction();
+	UE_LOG(LogTemp, Warning, TEXT("======================= ABullet::BeginPlay =========================="));
+	GetWorld()->GetTimerManager().SetTimer(timerDestruction, this, &ABullet::SelfDestruction, 3.0f, false);
 }
 
 // Called every frame
@@ -22,35 +23,26 @@ void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	SetActorLocation(GetActorLocation() + GetActorForwardVector() * speed * DeltaTime);
+	if (toDestroy && setedOut)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(timerDestruction);
+		SelfDestruction();
+	}
 }
 
-void ABullet::TimerToDestruction()
+void ABullet::AddToBaseDamage(float damage)
 {
-	GetWorld()->GetTimerManager().SetTimer(timerDestruction, this, &ABullet::SelfDestruction, 3.0f, false);
+	UE_LOG(LogTemp, Warning, TEXT("======================= ABullet::AddToBaseDamage =========================="));
+	setedOut = true;
+	dmg += damage;
+}
+
+void ABullet::MarkAsToDestroy()
+{
+	toDestroy = true;
 }
 
 void ABullet::SelfDestruction()
 {
 	Destroy();
 }
-
-void ABullet::CheckCollision(AActor* otherActor, UPrimitiveComponent* compCollision)
-{
-	/*auto zombie = Cast<AZombie>(otherActor);
-	if (zombie != nullptr)
-	{
-		if (compCollision->IsA(UCapsuleComponent::StaticClass()))
-		{
-			zombie->GetHit(dmg);
-			SelfDestruction();
-		}
-		if (compCollision->IsA(UBoxComponent::StaticClass()))
-		{
-			zombie->GetHit(dmg/4);
-			SelfDestruction();
-		}
-	}*/
-}
-
-
-

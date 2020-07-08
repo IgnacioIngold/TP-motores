@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Zombie.h"
+#include "ZG_GameModeBase.h"
 
 // Sets default values
 AZombie::AZombie()
@@ -17,10 +18,12 @@ void AZombie::BeginPlay()
 	target = GetWorld()->GetFirstPlayerController()->GetPawn();
 	currentBehaviour = EBehaviours::Avoidance;
 	timeAttack = attackDuration;
-	SpitChecked = false;
 	_anim = Cast<UAnimI_Zombie>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
 	myAudioComp = FindComponentByClass<UAudioComponent>();
 	_gamemode = Cast<AZG_GameModeBase>(GetWorld()->GetAuthGameMode());
+	spitCooldDown = 0;
+
+	_initialHealth = Health;
 
 	if (refMaterial)
 	{
@@ -66,8 +69,8 @@ void AZombie::Tick(float DeltaTime)
 				Attack(DeltaTime);
 				break; 
 			case EBehaviours::Spit:
-					Spit(DeltaTime);
-					break;
+					Spit();
+				break;
 		}
 
 		if (currentBehaviour == EBehaviours::Follow || currentBehaviour == EBehaviours::Avoidance)
@@ -79,31 +82,25 @@ void AZombie::Tick(float DeltaTime)
 				myAudioComp->Play();
 			}
 		}
-	}
-	distanceToTarget = dir.Size();
 
-	if (distanceToTarget <= SpitRangeMax && distanceToTarget >= SpitRangeMin && !SpitChecked)
-	{
-		int result = rand() % 5 + 1;
-		
-		if (result == 1)
+		distanceToTarget = dir.Size();
+
+		if (spitCooldDown <= 0 && !spitting)
 		{
-			timeSpitting = SpitDuration;
-			currentBehaviour = EBehaviours::Spit;
-			
+			if (distanceToTarget < SpitRangeMax && distanceToTarget > SpitRangeMin)
+			{
+				int result = rand() % 5 + 1;
+				//UE_LOG(LogTemp, Warning, TEXT("Random Number Result is: %i"), result);
+				if (result == 2)
+					Spit();
+			}
 		}
-		SpitChecked = true;
-		GetWorld()->GetTimerManager().SetTimer(timerSpit, this, &AZombie::ChangeSpitChecked, 5.0f, false);
 	}
-
 }
-
-
-
 
 void AZombie::FollowMyTarget(float deltaTime)
 {
-	//Me muevo en direcci�n a mi objetivo.
+	//Me muevo en direccion a mi objetivo.
 	LookTowardsTarget();
 
 	if (closestObstacle)
@@ -129,29 +126,48 @@ void AZombie::LookTowardsTarget()
 	SetActorRotation(dir.Rotation());
 }
 
-void AZombie::ChangeSpitChecked()
+void AZombie::Spit()
 {
-	SpitChecked = false;
-}
-void AZombie::Spit(float deltaTime)
-{
+	//UE_LOG(LogTemp, Warning, TEXT("================================== Spit LCDTM ============================="));
+	currentBehaviour = EBehaviours::Spit;
+	spitCooldDown = SpitCoolDownDuration;
 	LookTowardsTarget();
-	timeSpitting -= deltaTime;
 
-	if (timeSpitting <= SpitDuration - 1.321f && !SpitPerform)
+	if (!spitting)
 	{
-		SpitPerform=true;
+		spitting = true;
 
-		FTransform position = this->SpitSpawner->GetComponentTransform();
-		AZombieSpit* bullet = GetWorld()->SpawnActor<AZombieSpit>(prefabSpit, position);
+		if (_anim)
+			_anim->Spitting = true;
+
+		if (SpitSpawner)
+		{
+			FTransform position = SpitSpawner->GetComponentTransform();
+			GetWorld()->SpawnActor<AZombieSpit>(prefabSpit, position);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("El componente no esta seteado"));
+
+		GetWorld()->GetTimerManager().SetTimer(timerSpit, this, &AZombie::spitEnded, SpitDuration, false);
+		//UE_LOG(LogTemp, Warning, TEXT("SpitingTimerSetted"));
 	}
-	if (timeSpitting<=0)
-	{
-		currentBehaviour = EBehaviours::Follow;
-	}
+}
 
-	_anim->ChangeSpitValue(true);
+void AZombie::spitEnded() 
+{
+	//UE_LOG(LogTemp, Warning, TEXT(""));
+	//UE_LOG(LogTemp, Warning, TEXT("====================== Spit Ended =================================="));
+	spitting = false;
 
+	if (_anim)
+		_anim->Spitting = false;
+
+	currentBehaviour = EBehaviours::Follow;
+	GetWorld()->GetTimerManager().SetTimer(timerSpitCooldown, this, &AZombie::resetSpitCoolDown, spitCooldDown, false);
+}
+
+void AZombie::resetSpitCoolDown()
+{
+	spitCooldDown = 0;
 }
 
 void AZombie::AvoidanceObstacles(float deltaTime)
@@ -221,11 +237,8 @@ void AZombie::GetHit(int damage)
 
 void AZombie::Die()
 {
-	bool enterOneTime;
-	enterOneTime = true;
-	if (myAudioComp && enterOneTime)
+	if (myAudioComp)
 	{
-		enterOneTime = false;
 		myAudioComp->Stop();
 
 		if (dieCue)
@@ -234,10 +247,9 @@ void AZombie::Die()
 			myAudioComp->Play();
 		}
 
-		if (_gamemode != nullptr)
-		{
-			_gamemode->ZombieDied();
-		}
+		if (lifeBarWidget)
+			lifeBarWidget->SetVisibility(ESlateVisibility::Hidden);
+		if (_gamemode != nullptr) _gamemode->ZombieDied(respawns > 0);
 	}
 
 	_anim->ChangeLifeValue(true);
@@ -246,6 +258,30 @@ void AZombie::Die()
 	GetWorld()->GetTimerManager().SetTimer(timerStartDisolve, this, &AZombie::SetDisolveOn, 7.0, false);
 	GetWorld()->GetTimerManager().SetTimer(timerDead, this , &AZombie::DestroyDead, 10.0f, false);
 }
+void AZombie::Respawn(FVector respawnPosition)
+{
+	SetActorLocation(respawnPosition);
+	Health = _initialHealth;
+	HeathPercent = 1.0f;
+	IsDead = false;
+	fadeBody = false;
+	currentBehaviour = EBehaviours::Follow;
+
+	if (lifeBarWidget)
+		lifeBarWidget->SetVisibility(ESlateVisibility::Visible);
+
+	if (_anim)
+	{
+		_anim->Die = false;
+		_anim->Spitting = false;
+		_anim->GetHited = false;
+		_anim->Attaking = false;
+	}
+
+	if (DynMaterial)
+		DynMaterial->SetScalarParameterValue("Dissolve", 1.6f);
+}
+
 void AZombie::SetDisolveOn()
 {
 	fadeBody = true;
@@ -253,7 +289,12 @@ void AZombie::SetDisolveOn()
 
 void AZombie::DestroyDead()
 {
-	Destroy();
+	if (respawns > 0)
+	{
+		respawns--;
+		_gamemode->registerZombieToRespawnList(this);
+	}
+	else Destroy();
 }
 
 
@@ -305,6 +346,7 @@ void AZombie::BodyCollisionHandler(AActor* other, int bodyPart)
 {
 	ABullet* bullet = Cast<ABullet>(other);
 	if (bullet == nullptr) return;
+	UE_LOG(LogTemp, Warning, TEXT("Una bala me la puso xD"));
 
 	FString Part = "";
 	switch (bodyPart)
@@ -313,21 +355,21 @@ void AZombie::BodyCollisionHandler(AActor* other, int bodyPart)
 		Part = "Torso";
 		if (_gamemode)
 			_gamemode->AddPoints(pointsForHitTorso);
-		GetHit(DamageForHitTorso);
+		GetHit(DamageForHitTorso + bullet->dmg);
 		break;
 
 	case  1:
 		Part = "Left Arm";
 		if (_gamemode)
 			_gamemode->AddPoints(pointsForHitLeftArm);
-		GetHit(DamageForHitLeftArm);
+		GetHit(DamageForHitLeftArm + bullet->dmg); 
 		break;
 
 	case 2:
 		Part = "Right Arm";
 		if (_gamemode)
 			_gamemode->AddPoints(pointsForHitRightArm);
-		GetHit(DamageForHitRightArm);
+		GetHit(DamageForHitRightArm + bullet->dmg);
 		break;
 
 	default:
@@ -346,7 +388,7 @@ void AZombie::BodyCollisionHandler(AActor* other, int bodyPart)
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFeedback,position, rotation, true);
 
-	other->Destroy();
+	bullet->MarkAsToDestroy();
 	//UE_LOG(LogTemp, Warning, TEXT("Collisionó la wea en: %s"), *Part);
 }
 

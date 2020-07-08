@@ -16,7 +16,7 @@ class ZOMBIEGAME_API UAnimI_Zombie : public UAnimInstance
 
 public: 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	bool Attaking;
+		bool Attaking;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 		bool Die;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)

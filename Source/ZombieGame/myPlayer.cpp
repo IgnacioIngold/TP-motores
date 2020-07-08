@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "myPlayer.h"
-
+#include "ZG_GameModeBase.h"
 
 // Sets default values
 AmyPlayer::AmyPlayer()
@@ -109,6 +109,7 @@ void AmyPlayer::Shoot()
 				spawnParams.Owner = GetOwner();
 
 				ABullet* bullet = World->SpawnActor<ABullet>(prefabBullet, position);
+				bullet->AddToBaseDamage(BaseDamage);
 
 				if (this->animController != NULL)
 				{
@@ -289,9 +290,9 @@ void AmyPlayer::GetSlowed()
 {
 	if (!Slowed)
 	{
-	CurrentSpeed = MovementSpeed / 10;
-	Slowed = true;
-	GetWorld()->GetTimerManager().SetTimer(_SlowCooldown, this, &AmyPlayer::GetRecovered, 4.0f, false);
+		CurrentSpeed = MovementSpeed / 10;
+		Slowed = true;
+		GetWorld()->GetTimerManager().SetTimer(_SlowCooldown, this, &AmyPlayer::GetRecovered, 4.0f, false);
 	}
 }
 
@@ -301,3 +302,7 @@ void AmyPlayer::GetRecovered()
 	Slowed = false;
 }
 
+void AmyPlayer::AddExtraDamage(float extraDamage)
+{
+	BaseDamage += extraDamage;
+}

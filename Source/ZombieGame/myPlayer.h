@@ -6,9 +6,10 @@
 #include "BasePlayer_AnimInstance.h"
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
-#include "ZG_GameModeBase.h"
 #include "Math/UnrealMathUtility.h"
 #include "myPlayer.generated.h"
+
+class AZG_GameModeBase;
 
 UCLASS()
 class ZOMBIEGAME_API AmyPlayer : public ACharacter
@@ -48,6 +49,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
 		int AmmoInMagazine = 30;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
+		float BaseDamage = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (DisplayPriority = 2))
 		int MaxAmmoInMagazine = 30;
@@ -109,6 +113,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void AddExtraMagazineSlots(int extraBullets);
+
+	UFUNCTION(BlueprintCallable)
+		void AddExtraDamage(float extraDamage);
 
 	UFUNCTION(BlueprintCallable)
 		void ShootWithTransform(FTransform transform);

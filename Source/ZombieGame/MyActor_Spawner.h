@@ -24,6 +24,10 @@ public:
 		float timerToSpawn;
 	UPROPERTY(EditAnyWhere)
 		bool bucleSpawn;
+	/*UPROPERTY(EditAnywhere)
+		TArray<AZombie> spawned;*/
+	UPROPERTY(EditAnywhere)
+		TArray<AZombie*> toRespawn;
 
 	FTimerHandle timerSpawn;
 
@@ -35,4 +39,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void SpawnZombie();
+	void RegisterToRespawn(AZombie* zombie);
 };

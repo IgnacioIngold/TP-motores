@@ -8,8 +8,9 @@
 #include "myPlayer.h"
 #include "ZombieSpit.h"
 #include "GameFramework/Actor.h"
-#include "ZG_GameModeBase.h"
 #include "Zombie.generated.h"
+
+class AZG_GameModeBase;
 
 UENUM(BlueprintType)
 enum class EBehaviours : uint8
@@ -41,6 +42,8 @@ public:
 		UMaterialInstanceDynamic * DynMaterial;
 	UPROPERTY()
 		bool fadeBody = false;
+	UPROPERTY(BlueprintReadWrite)
+		UUserWidget * lifeBarWidget;
 
 	UPROPERTY(EditAnywhere)
 		USoundCue* dieCue;
@@ -64,6 +67,8 @@ public:
 		float SpitRangeMax;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 		float SpitRangeMin;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+		float SpitCoolDownDuration = 6.0f;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
@@ -125,6 +130,7 @@ public:
 
 	FTimerHandle timerDead;
 	FTimerHandle timerSpit;
+	FTimerHandle timerSpitCooldown;
 	FTimerHandle timerStartDisolve;
 	void SetDisolveOn();
 
@@ -132,41 +138,43 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	int respawns = 1;
+	float _initialHealth;
+
 	FVector dir;
 
-	float dist;
+	float dist = 0;
 
-	float timeAttack;
+	float timeAttack = 0;
 
-	float timeSpitting;
+	bool AttackPerform = false;
 
-	bool AttackPerform;
+	bool spitting = false;
+	float spitCooldDown = 0;
 
-	bool SpitChecked;
-	
-	bool SpitPerform;
-
-	float distanceToTarget;
+	float distanceToTarget = 0;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	
 	void FollowMyTarget(float deltaTime);
 	void LookTowardsTarget();
 	void AvoidanceObstacles(float deltaTime);
 	void Attack(float deltaTime);
-	void Spit(float deltaTime);
-	void ChangeSpitChecked();
+	void Spit();
+	void spitEnded();
+	void resetSpitCoolDown();
 	void GetHit(int Damage);
+	
 	UFUNCTION(BlueprintCallable)
-	void Die();
+		void Die();
+	UFUNCTION(BlueprintCallable)
+		void Respawn(FVector respawnPosition);
 
 	void DestroyDead();
 	void raycastAttack();
-	
-	
+
 	UFUNCTION(BlueprintCallable)
 		void myBeginOverlap(AActor * ActorOverlap);
 	

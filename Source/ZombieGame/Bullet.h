@@ -21,7 +21,10 @@ public:
 	UPROPERTY(EditAnywhere)
 		float dmg;
 
+private:
 
+	bool setedOut = false;
+	bool toDestroy = false;
 	FTimerHandle timerDestruction;
 
 protected:
@@ -31,11 +34,13 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	void TimerToDestruction();
+
+	UFUNCTION(BlueprintCallable)
+		void MarkAsToDestroy();
 
 	UFUNCTION(BlueprintCallable)
 		void SelfDestruction();
-	
+
 	UFUNCTION(BlueprintCallable)
-		void CheckCollision(AActor* otherActor, UPrimitiveComponent* compCollision);
+		void AddToBaseDamage(float damage);
 };

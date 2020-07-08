@@ -32,9 +32,17 @@ void AMyActor_Spawner::SpawnZombie()
 	{
 		if (baseGameMode->CanSpawnNewZombies())
 		{
-			FActorSpawnParameters p;
-			GetWorld()->SpawnActor<AZombie>(prefabZombie, GetActorLocation(), GetActorRotation(), p);
-			baseGameMode->ZombieSpawned();
+			AZombie* respawneable = baseGameMode->getRespawnableZombie();
+			if (respawneable != nullptr)
+			{
+				baseGameMode->ZombieSpawned(true);
+				respawneable->Respawn(GetActorLocation());
+			}
+			else
+			{
+				AZombie * zSpawned = GetWorld()->SpawnActor<AZombie>(prefabZombie, GetActorLocation(), GetActorRotation());
+				baseGameMode->ZombieSpawned(false);
+			}
 		}
 		/*else
 		{
@@ -43,3 +51,7 @@ void AMyActor_Spawner::SpawnZombie()
 	}
 }
 
+void AMyActor_Spawner::RegisterToRespawn(AZombie * zombie)
+{
+	toRespawn.Add(zombie);
+}

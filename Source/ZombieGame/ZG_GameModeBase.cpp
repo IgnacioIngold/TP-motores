@@ -103,19 +103,19 @@ void AZG_GameModeBase::AddPlayerHudToScene()
 	}
 }
 
-void AZG_GameModeBase::ZombieSpawned()
+void AZG_GameModeBase::ZombieSpawned(bool isReespawning)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("================================== AZG_GameModeBase::ZombieSpawned() ======================================"));
 	_activeZombies++;
 	TotalZombiesSpawnedInCurrentWave++;
-	spawnLock = !(TotalZombiesSpawnedInCurrentWave < zombiesPerRound[(WaveNumber - 1)]);
+	lockSpawning = !(TotalZombiesSpawnedInCurrentWave < zombiesToKill[(WaveNumber - 1)]);
 	
 	//if (spawnLock) UE_LOG(LogTemp, Warning, TEXT("spawn Lock modified to true"))
 	//else UE_LOG(LogTemp, Warning, TEXT("spawn Lock modified to false"));
 	//UE_LOG(LogTemp, Warning, TEXT("==========================================================================================================="));
 }
 
-void AZG_GameModeBase::ZombieDied()
+void AZG_GameModeBase::ZombieDied(bool willRespawn)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("================================== AZG_GameModeBase::ZombieDied() ======================================"));
 	_activeZombies--;
@@ -128,7 +128,8 @@ void AZG_GameModeBase::ZombieDied()
 bool AZG_GameModeBase::CanSpawnNewZombies()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("================================== AZG_GameModeBase::CanSpawnNewZombies() ======================================"));
-	bool canSpawn = _activeZombies < SceneSpawnLimit && RemainingZombiesToEndCurrentWave > 0 && !spawnLock;
+	int waveIndex = WaveNumber - 1;
+	bool canSpawn = _activeZombies < SceneSpawnLimit && RemainingZombiesToEndCurrentWave > 0 && !lockSpawning;
 	
 	//if (spawnLock) UE_LOG(LogTemp, Warning, TEXT("Spawn is Locked!!"))
 	//else UE_LOG(LogTemp, Warning, TEXT("CanSpawn is UnLocked."));
@@ -160,7 +161,7 @@ void AZG_GameModeBase::WaveEnded()
 	if (_waveCompleteWidgetInstance && !_waveCompleteWidgetInstance->IsInViewport())
 		_waveCompleteWidgetInstance->AddToViewport();
 
-	if (zombiesPerRound.Num() - WaveNumber <= 0)
+	if (zombiesToKill.Num() - WaveNumber <= 0)
 		LevelCompleted(); //Termino el nivel.
 	else //Inicio el contador para la siguiente Oleada.
 	{
@@ -176,8 +177,8 @@ void AZG_GameModeBase::WaveEndCallback()
 	if (TimeRemainingForNextWave == 0)
 	{
 		TimeRemainingForNextWave = TimeBetweenWaves;
-		WaveStart();
 		GetWorld()->GetTimerManager().ClearTimer(WaveStartCounter);
+		WaveStart();
 	}
 }
 
@@ -185,15 +186,19 @@ void AZG_GameModeBase::WaveStart()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("AZG_GameModeBase::WaveStart()"))
 	WaveNumber++;          //Actualizo la oleada.
-	spawnLock = false;     //Desbloqueo el spawn de zombies.
+	lockSpawning = false;     //Desbloqueo el spawn de zombies.
 	lockTimeTrack = false; //Desbloqueo el track del tiempo.
 	_activeZombies = 0;//Actualizo la cantidad de zombies spawneados y el límite x escena.
 	TotalZombiesSpawnedInCurrentWave = 0;
 
-	if (waveSpawnLimits.Num() > 0)
-		SceneSpawnLimit = waveSpawnLimits[(WaveNumber - 1)];	
-	if (zombiesPerRound.Num() > 0) //Actualizo la cantidad de zombies que faltan para terminar la oleada.
-		RemainingZombiesToEndCurrentWave = zombiesPerRound[(WaveNumber - 1)];
+	int currentWaveIndex = WaveNumber - 1;
+	/*UE_LOG(LogTemp, Warning, TEXT("El indice es: %i"), currentWaveIndex);
+	UE_LOG(LogTemp, Warning, TEXT("Los Lenghts son: %i y %i respectivamente"), maxActiveZombiesInScenePerWave.Num(), zombiesToKill.Num());*/
+
+	if (maxActiveZombiesInScenePerWave.Num() > 0)
+		SceneSpawnLimit = maxActiveZombiesInScenePerWave[currentWaveIndex];	
+	if (zombiesToKill.Num() > 0) //Actualizo la cantidad de zombies que faltan para terminar la oleada.
+		RemainingZombiesToEndCurrentWave = zombiesToKill[currentWaveIndex];
 
 	if (_levelStartWidgetInstance && _levelStartWidgetInstance->IsInViewport())
 		_levelStartWidgetInstance->RemoveFromViewport();
@@ -206,7 +211,7 @@ void AZG_GameModeBase::WaveStart()
 void AZG_GameModeBase::LevelCompleted()
 {
 	lockTimeTrack = true;
-	spawnLock = true; //Bloqueo el spawn. Por si las dudas.
+	lockSpawning = true; //Bloqueo el spawn. Por si las dudas.
 	if (_levelEndWidgetInstance && !_levelEndWidgetInstance->IsInViewport()) //Activo el widget del final de nivel!.
 		_levelEndWidgetInstance->AddToViewport();
 	if (_waveCompleteWidgetInstance && _waveCompleteWidgetInstance->IsInViewport())
@@ -235,10 +240,13 @@ void AZG_GameModeBase::EndGameCallback()
 	}
 }
 
-void AZG_GameModeBase::SetLevelFlow(TArray<int> AmmountOfZombiesPerWave, TArray<int> ZombieSpawnLimitPerRound)
+void AZG_GameModeBase::SetLevelFlow(TArray<int> _ammountOfZombiesPerWave, TArray<int> _activeZombiesInScenePerWave)
 {
-	zombiesPerRound = AmmountOfZombiesPerWave;
-	waveSpawnLimits = ZombieSpawnLimitPerRound;
+	WaveNumber = 0;
+	zombiesToKill = _ammountOfZombiesPerWave;
+	maxActiveZombiesInScenePerWave = _activeZombiesInScenePerWave;
+
+	_spawnManager = Cast<ASpawnManagerBase>(GetWorld()->SpawnActor(_spawnManagerClass, &FVector::ZeroVector, &FRotator::ZeroRotator));
 }
 
 void AZG_GameModeBase::StartLevel()
@@ -247,6 +255,7 @@ void AZG_GameModeBase::StartLevel()
 	_currentWorld = GetWorld();
 	_currentLevel = _currentWorld->GetMapName();
 	lockTimeTrack = false;
+	lockSpawning = false;
 
 	if (RespawnWidget && _respawnWidgetInstance == nullptr)
 		_respawnWidgetInstance = CreateWidget(GetWorld(), RespawnWidget);
@@ -274,4 +283,25 @@ void AZG_GameModeBase::LoadPreviousData(int acumulatedScore, float survivedTime)
 {
 	Score = acumulatedScore;
 	GameTime = survivedTime;
+}
+
+AZombie* AZG_GameModeBase::getRespawnableZombie()
+{
+	if (_spawnManager)
+		return _spawnManager->getRespawneableZombie();
+	else
+	{
+		return nullptr;
+		UE_LOG(LogTemp, Warning, TEXT("SpawnManager no esta seteado"));
+	}
+}
+
+void AZG_GameModeBase::registerZombieToRespawnList(AZombie* reespawneable)
+{
+	if (_spawnManager)
+		_spawnManager->RegisterReespawneableZombie(reespawneable);
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SpawnManager no esta seteado"));
+	}
 }
